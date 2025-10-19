@@ -36,14 +36,25 @@ export class CreateToolRequestComponent implements OnInit {
 
   loadMasterData() {
     this.loading = true;
-    // Load data for reference but don't require selection
+    
     this.masterDataService.getStockItems().subscribe({
       next: (data) => {
         this.stockItems = data;
-        this.loading = false;
       },
       error: (err) => {
         console.error('Error loading stock items:', err);
+        this.error = 'حدث خطأ في تحميل الأدوات';
+      }
+    });
+
+    this.masterDataService.getWorkAreas().subscribe({
+      next: (data) => {
+        this.workAreas = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error loading work areas:', err);
+        this.error = 'حدث خطأ في تحميل مناطق العمل';
         this.loading = false;
       }
     });
@@ -58,7 +69,32 @@ export class CreateToolRequestComponent implements OnInit {
     this.error = null;
     this.successMessage = null;
 
-    this.toolRequestService.createToolRequest(this.formData).subscribe({
+    // Try to find matching tool and work area
+    const matchingTool = this.stockItems.find(item => item.nameAr === this.formData.toolName);
+    const matchingWorkArea = this.workAreas.find(area => area.nameAr === this.formData.workAreaName);
+
+    if (!matchingTool) {
+      this.error = 'لم يتم العثور على الأداة المحددة. الرجاء اختيار أداة من القائمة.';
+      this.submitting = false;
+      return;
+    }
+
+    if (!matchingWorkArea) {
+      this.error = 'لم يتم العثور على منطقة العمل المحددة. الرجاء اختيار منطقة عمل من القائمة.';
+      this.submitting = false;
+      return;
+    }
+
+    // Create the request DTO with IDs
+    const requestDto = {
+      toolId: matchingTool.id,
+      quantityNeeded: this.formData.quantityNeeded,
+      workAreaId: matchingWorkArea.id,
+      reasonAr: this.formData.reasonAr,
+      reasonEn: this.formData.reasonEn
+    };
+
+    this.toolRequestService.createToolRequest(requestDto).subscribe({
       next: (response) => {
         this.successMessage = 'تم إنشاء الطلب بنجاح!';
         this.submitting = false;

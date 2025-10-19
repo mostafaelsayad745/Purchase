@@ -188,6 +188,51 @@
       <li><strong>المسؤول:</strong> SecondApprover (الموافق الثاني)</li>
       <li><strong>معايير الاختيار:</strong> السعر، وقت التسليم، تقييم المورد، جودة المنتج</li>
       <li><strong>بعد الاختيار:</strong> الانتقال إلى الخطوة 6 (إنشاء أمر الشراء)</li>
+      <li><strong>الأرشفة:</strong> عند الموافقة على عرض معين، يتم أرشفة جميع العروض الأخرى للرجوع إليها لاحقاً</li>
     </ul>
+  </div>
+
+  <!-- Archived Quotations Section -->
+  <div class="card" *ngIf="archivedQuotations.length > 0" style="background: #fff3cd; border-right: 4px solid #ffc107;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3>📦 العروض المؤرشفة</h3>
+      <button class="btn" (click)="showArchived = !showArchived" style="background: #ffc107; color: #000;">
+        {{ showArchived ? 'إخفاء الأرشيف' : 'عرض الأرشيف' }}
+      </button>
+    </div>
+    
+    <div *ngIf="showArchived">
+      <p>إجمالي العروض المؤرشفة: {{ archivedQuotations.length }}</p>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px;">
+        <div *ngFor="let archived of archivedQuotations" class="quotation-card" style="background: #f8f9fa; border: 1px solid #dee2e6;">
+          <div style="background: #ffc107; padding: 4px 8px; border-radius: 4px; margin-bottom: 8px;">
+            <strong>مؤرشف في: {{ archived.archivedDate | date:'yyyy-MM-dd HH:mm' }}</strong>
+          </div>
+          <div class="supplier-section">
+            <h4>{{ archived.supplierNameAr }}</h4>
+            <p class="supplier-name-en">{{ archived.supplierNameEn }}</p>
+          </div>
+          <div class="details-section">
+            <div class="detail-row">
+              <span class="label">الكمية المعروضة:</span>
+              <span class="value">{{ archived.quantityOffered }} قطعة</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">السعر الإجمالي:</span>
+              <span class="value total-price">{{ archived.totalPrice | number:'1.2-2' }} ريال</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">تاريخ العرض:</span>
+              <span class="value">{{ archived.quotationDate | date:'yyyy-MM-dd' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">سبب الأرشفة:</span>
+              <span class="value">{{ archived.archivedReason }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
