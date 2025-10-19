@@ -1,0 +1,118 @@
+<div class="container">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h1>تفاصيل إيصال الاستلام</h1>
+    <button class="btn" (click)="goBack()" style="background: #6c757d; color: white;">
+      ← العودة للقائمة
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <p>جاري التحميل...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error && goodsReceipt">
+    <div class="card">
+      <h2>معلومات الاستلام</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+        <div>
+          <strong>رقم أمر الشراء:</strong>
+          <p>{{ goodsReceipt.purchaseOrder?.orderNumber }}</p>
+        </div>
+        <div>
+          <strong>تاريخ الاستلام:</strong>
+          <p>{{ goodsReceipt.receivedDate | date:'yyyy-MM-dd HH:mm' }}</p>
+        </div>
+        <div>
+          <strong>الكمية المستلمة:</strong>
+          <p style="font-size: 18px; font-weight: bold;">{{ goodsReceipt.receivedQuantity }} قطعة</p>
+        </div>
+        <div>
+          <strong>الكمية المتوقعة:</strong>
+          <p>{{ goodsReceipt.expectedQuantity }} قطعة</p>
+        </div>
+        <div>
+          <strong>نسبة التباين:</strong>
+          <p [style.color]="goodsReceipt.isQuantityAcceptable ? 'green' : 'red'">
+            {{ goodsReceipt.quantityVariancePercentage | number:'1.2-2' }}%
+          </p>
+        </div>
+        <div>
+          <strong>الكمية مقبولة:</strong>
+          <p>
+            <span *ngIf="goodsReceipt.isQuantityAcceptable" style="color: green;">✓ نعم</span>
+            <span *ngIf="!goodsReceipt.isQuantityAcceptable" style="color: red;">✗ لا</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>معلومات الجودة</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+        <div>
+          <strong>حالة الجودة:</strong>
+          <p>
+            <span [class]="'status-badge ' + getQualityColor(goodsReceipt.qualityStatus)">
+              {{ getQualityText(goodsReceipt.qualityStatus) }}
+            </span>
+          </p>
+        </div>
+        <div>
+          <strong>مستلم بواسطة:</strong>
+          <p>{{ goodsReceipt.receivedByNameAr }}</p>
+        </div>
+      </div>
+      <div *ngIf="goodsReceipt.qualityNotes" style="margin-top: 16px;">
+        <strong>ملاحظات الجودة:</strong>
+        <p>{{ goodsReceipt.qualityNotes }}</p>
+      </div>
+      <div *ngIf="goodsReceipt.conditionNotes" style="margin-top: 16px;">
+        <strong>ملاحظات الحالة:</strong>
+        <p>{{ goodsReceipt.conditionNotes }}</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>تحديث المخزون</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+        <div>
+          <strong>تم التحديث:</strong>
+          <p>
+            <span *ngIf="goodsReceipt.stockUpdated" style="color: green;">✓ تم التحديث</span>
+            <span *ngIf="!goodsReceipt.stockUpdated" style="color: orange;">⚠ لم يتم التحديث</span>
+          </p>
+        </div>
+        <div *ngIf="goodsReceipt.stockUpdateDate">
+          <strong>تاريخ التحديث:</strong>
+          <p>{{ goodsReceipt.stockUpdateDate | date:'yyyy-MM-dd HH:mm' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" *ngIf="goodsReceipt.proofOfReceiptDocument">
+      <h2>المستندات</h2>
+      <div>
+        <strong>مستند إثبات الاستلام:</strong>
+        <p>{{ goodsReceipt.proofOfReceiptDocument }}</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>التواريخ</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+        <div>
+          <strong>تاريخ الإنشاء:</strong>
+          <p>{{ goodsReceipt.createdAt | date:'yyyy-MM-dd HH:mm' }}</p>
+        </div>
+        <div>
+          <strong>آخر تحديث:</strong>
+          <p>{{ goodsReceipt.updatedAt | date:'yyyy-MM-dd HH:mm' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

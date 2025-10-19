@@ -16,10 +16,10 @@ export class CreateToolRequestComponent implements OnInit {
   error: string | null = null;
   successMessage: string | null = null;
 
-  formData: CreateToolRequestDto = {
-    toolId: 0,
+  formData: any = {
+    toolName: '',
+    workAreaName: '',
     quantityNeeded: 1,
-    workAreaId: 0,
     reasonAr: '',
     reasonEn: ''
   };
@@ -36,25 +36,14 @@ export class CreateToolRequestComponent implements OnInit {
 
   loadMasterData() {
     this.loading = true;
-    
+    // Load data for reference but don't require selection
     this.masterDataService.getStockItems().subscribe({
       next: (data) => {
         this.stockItems = data;
-      },
-      error: (err) => {
-        console.error('Error loading stock items:', err);
-        this.error = 'حدث خطأ في تحميل الأدوات';
-      }
-    });
-
-    this.masterDataService.getWorkAreas().subscribe({
-      next: (data) => {
-        this.workAreas = data;
         this.loading = false;
       },
       error: (err) => {
-        console.error('Error loading work areas:', err);
-        this.error = 'حدث خطأ في تحميل مناطق العمل';
+        console.error('Error loading stock items:', err);
         this.loading = false;
       }
     });
@@ -88,16 +77,16 @@ export class CreateToolRequestComponent implements OnInit {
   }
 
   validateForm(): boolean {
-    if (this.formData.toolId === 0) {
-      this.error = 'الرجاء اختيار الأداة';
+    if (!this.formData.toolName || !this.formData.toolName.trim()) {
+      this.error = 'الرجاء إدخال اسم الأداة';
       return false;
     }
     if (this.formData.quantityNeeded < 1) {
       this.error = 'الرجاء إدخال كمية صحيحة';
       return false;
     }
-    if (this.formData.workAreaId === 0) {
-      this.error = 'الرجاء اختيار منطقة العمل';
+    if (!this.formData.workAreaName || !this.formData.workAreaName.trim()) {
+      this.error = 'الرجاء إدخال اسم منطقة العمل';
       return false;
     }
     if (!this.formData.reasonAr.trim()) {

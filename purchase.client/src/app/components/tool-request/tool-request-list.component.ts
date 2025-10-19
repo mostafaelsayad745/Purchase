@@ -9,9 +9,20 @@ import { ToolRequestService, ToolRequest } from '../../services/tool-request.ser
 })
 export class ToolRequestListComponent implements OnInit {
   toolRequests: ToolRequest[] = [];
+  filteredRequests: ToolRequest[] = [];
+  paginatedRequests: ToolRequest[] = [];
   loading = false;
   error: string | null = null;
   selectedStatus = '';
+  filterToolName = '';
+  filterDate = '';
+  
+  // Pagination
+  currentPage = 1;
+  pageSize = 10;
+  totalPages = 1;
+  startIndex = 0;
+  endIndex = 0;
 
   constructor(
     private toolRequestService: ToolRequestService,
@@ -26,10 +37,10 @@ export class ToolRequestListComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    const status = this.selectedStatus || undefined;
-    this.toolRequestService.getToolRequests(status).subscribe({
+    this.toolRequestService.getToolRequests().subscribe({
       next: (data) => {
         this.toolRequests = data;
+        this.applyFilters();
         this.loading = false;
       },
       error: (err) => {
@@ -40,8 +51,46 @@ export class ToolRequestListComponent implements OnInit {
     });
   }
 
-  filterByStatus() {
-    this.loadToolRequests();
+  applyFilters() {
+    this.filteredRequests = this.toolRequests.filter(request => {
+      const matchesStatus = !this.selectedStatus || request.status === this.selectedStatus;
+      const matchesToolName = !this.filterToolName || 
+        request.toolNameAr.includes(this.filterToolName) ||
+        request.toolNameEn.toLowerCase().includes(this.filterToolName.toLowerCase());
+      const matchesDate = !this.filterDate || 
+        request.requestDate.startsWith(this.filterDate);
+      
+      return matchesStatus && matchesToolName && matchesDate;
+    });
+    
+    this.currentPage = 1;
+    this.updatePagination();
+  }
+
+  updatePagination() {
+    this.totalPages = Math.ceil(this.filteredRequests.length / this.pageSize);
+    this.startIndex = (this.currentPage - 1) * this.pageSize;
+    this.endIndex = Math.min(this.startIndex + this.pageSize, this.filteredRequests.length);
+    this.paginatedRequests = this.filteredRequests.slice(this.startIndex, this.endIndex);
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+
+  onPageSizeChange() {
+    this.currentPage = 1;
+    this.updatePagination();
   }
 
   getStatusText(status: string): string {

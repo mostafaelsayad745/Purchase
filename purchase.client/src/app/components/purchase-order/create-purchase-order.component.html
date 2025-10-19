@@ -1,0 +1,85 @@
+<div class="container">
+  <h1>إنشاء أمر شراء جديد</h1>
+
+  <div class="card">
+    <h2>الخطوة 6: أمر الشراء وإدارة المستندات</h2>
+    <p>قم بملء النموذج التالي لإنشاء أمر شراء من عرض سعر محدد</p>
+
+    <div *ngIf="loading" class="loading">
+      <p>جاري التحميل...</p>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+
+    <div *ngIf="successMessage" class="success-message">
+      {{ successMessage }}
+    </div>
+
+    <form *ngIf="!loading" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label class="form-label">عرض السعر المحدد *</label>
+        <select class="form-control" [(ngModel)]="formData.quotationId" name="quotationId" required>
+          <option [value]="0">-- اختر عرض السعر --</option>
+          <option *ngFor="let quotation of selectedQuotations" [value]="quotation.id">
+            {{ quotation.supplierNameAr }} - {{ quotation.totalPrice | number:'1.2-2' }} ريال
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">تاريخ التسليم المتوقع *</label>
+        <input 
+          type="date" 
+          class="form-control" 
+          [(ngModel)]="formData.expectedDeliveryDate" 
+          name="expectedDeliveryDate"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">ملاحظات</label>
+        <textarea 
+          class="form-control" 
+          [(ngModel)]="formData.notes" 
+          name="notes"
+          rows="4"
+          maxlength="500"
+          placeholder="أدخل أي ملاحظات إضافية..."
+        ></textarea>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button 
+          type="submit" 
+          class="btn btn-success" 
+          [disabled]="submitting"
+          style="flex: 1;"
+        >
+          {{ submitting ? 'جاري الحفظ...' : 'حفظ الأمر' }}
+        </button>
+        <button 
+          type="button" 
+          class="btn" 
+          (click)="cancel()"
+          [disabled]="submitting"
+          style="flex: 1; background: #6c757d; color: white;"
+        >
+          إلغاء
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card" style="background: #e7f3ff; border-right: 4px solid var(--info-color);">
+    <h3>📋 معلومات مهمة</h3>
+    <ul style="margin: 12px 0; padding-right: 20px;">
+      <li>يتم إنشاء أمر الشراء من عرض سعر محدد في الخطوة السابقة</li>
+      <li>سيتم إنشاء رقم أمر شراء تلقائياً</li>
+      <li>يمكنك تحميل المستندات المطلوبة بعد إنشاء الأمر</li>
+      <li>بعد إنشاء أمر الشراء، انتقل إلى الخطوة 7 (استلام البضائع)</li>
+    </ul>
+  </div>
+</div>

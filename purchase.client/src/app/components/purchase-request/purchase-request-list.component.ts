@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { PurchaseRequestService, PurchaseRequest } from '../../services/purchase-request.service';
+import { PurchaseRequestService, PurchaseRequest, CreatePurchaseRequestDto } from '../../services/purchase-request.service';
+import { ToolRequestService, ToolRequest } from '../../services/tool-request.service';
 
 @Component({
   selector: 'app-purchase-request-list',
@@ -9,17 +10,27 @@ import { PurchaseRequestService, PurchaseRequest } from '../../services/purchase
 })
 export class PurchaseRequestListComponent implements OnInit {
   purchaseRequests: PurchaseRequest[] = [];
+  outOfStockToolRequests: ToolRequest[] = [];
   loading = false;
+  creating = false;
   error: string | null = null;
   selectedStatus = '';
+  showCreateForm = false;
+  
+  newPurchaseRequest: CreatePurchaseRequestDto = {
+    toolRequestId: 0,
+    estimatedBudget: 0
+  };
 
   constructor(
     private purchaseRequestService: PurchaseRequestService,
+    private toolRequestService: ToolRequestService,
     private router: Router
   ) {}
 
   ngOnInit() {
     this.loadPurchaseRequests();
+    this.loadOutOfStockToolRequests();
   }
 
   loadPurchaseRequests() {
@@ -103,5 +114,46 @@ export class PurchaseRequestListComponent implements OnInit {
         }
       });
     }
+  }
+
+  loadOutOfStockToolRequests() {
+    this.toolRequestService.getToolRequests('OutOfStock').subscribe({
+      next: (data) => {
+        this.outOfStockToolRequests = data;
+      },
+      error: (err) => {
+        console.error('Error loading tool requests:', err);
+      }
+    });
+  }
+
+  createPurchaseRequest() {
+    if (this.newPurchaseRequest.toolRequestId === 0) {
+      alert('الرجاء اختيار طلب الأداة');
+      return;
+    }
+
+    this.creating = true;
+    this.purchaseRequestService.createPurchaseRequest(this.newPurchaseRequest).subscribe({
+      next: () => {
+        alert('تم إنشاء طلب الشراء بنجاح');
+        this.showCreateForm = false;
+        this.resetForm();
+        this.loadPurchaseRequests();
+        this.creating = false;
+      },
+      error: (err) => {
+        console.error('Error creating purchase request:', err);
+        alert('حدث خطأ في إنشاء طلب الشراء');
+        this.creating = false;
+      }
+    });
+  }
+
+  resetForm() {
+    this.newPurchaseRequest = {
+      toolRequestId: 0,
+      estimatedBudget: 0
+    };
   }
 }
