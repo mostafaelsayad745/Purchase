@@ -1,7 +1,47 @@
 <div class="container">
-  <div class="page-header">
-    <h2>📋 طلبات الشراء</h2>
-    <p class="subtitle">Purchase Requests - Step 3: First Approval</p>
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h2>📋 طلبات الشراء</h2>
+      <p class="subtitle">Purchase Requests - Step 3: First Approval</p>
+    </div>
+    <button class="btn btn-primary" (click)="showCreateForm = !showCreateForm">
+      {{ showCreateForm ? 'إخفاء النموذج' : '+ إنشاء طلب شراء يدوياً' }}
+    </button>
+  </div>
+
+  <!-- Manual Create Form -->
+  <div *ngIf="showCreateForm" class="card" style="background: #f8f9fa; margin-bottom: 20px;">
+    <h3>إنشاء طلب شراء يدوياً</h3>
+    <form (ngSubmit)="createPurchaseRequest()">
+      <div class="form-group">
+        <label class="form-label">طلب الأداة *</label>
+        <select class="form-control" [(ngModel)]="newPurchaseRequest.toolRequestId" name="toolRequestId" required>
+          <option [value]="0">-- اختر طلب الأداة --</option>
+          <option *ngFor="let tr of outOfStockToolRequests" [value]="tr.id">
+            {{ tr.toolNameAr }} - الكمية: {{ tr.quantityNeeded }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">الميزانية المقدرة (ريال)</label>
+        <input 
+          type="number" 
+          class="form-control" 
+          [(ngModel)]="newPurchaseRequest.estimatedBudget" 
+          name="estimatedBudget"
+          min="0"
+          step="0.01"
+        />
+      </div>
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <button type="submit" class="btn btn-success" [disabled]="creating">
+          {{ creating ? 'جاري الحفظ...' : 'حفظ الطلب' }}
+        </button>
+        <button type="button" class="btn" (click)="showCreateForm = false; resetForm()" style="background: #6c757d; color: white;">
+          إلغاء
+        </button>
+      </div>
+    </form>
   </div>
 
   <div class="filter-section">

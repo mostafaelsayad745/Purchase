@@ -1,0 +1,107 @@
+<div class="container">
+  <h1>إنشاء دفعة جديدة</h1>
+
+  <div class="card">
+    <h2>الخطوة 8: معالجة الدفع</h2>
+    <p>قم بملء النموذج التالي لإنشاء دفعة جديدة</p>
+
+    <div *ngIf="loading" class="loading">
+      <p>جاري التحميل...</p>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+
+    <div *ngIf="successMessage" class="success-message">
+      {{ successMessage }}
+    </div>
+
+    <form *ngIf="!loading" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label class="form-label">إيصال الاستلام *</label>
+        <select class="form-control" [(ngModel)]="formData.goodsReceiptId" name="goodsReceiptId" required>
+          <option [value]="0">-- اختر إيصال الاستلام --</option>
+          <option *ngFor="let receipt of goodsReceipts" [value]="receipt.id">
+            {{ receipt.orderNumber }} - {{ receipt.toolNameAr }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">المبلغ (ريال) *</label>
+        <input 
+          type="number" 
+          class="form-control" 
+          [(ngModel)]="formData.amount" 
+          name="amount"
+          min="0.01"
+          step="0.01"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">تاريخ الدفع *</label>
+        <input 
+          type="date" 
+          class="form-control" 
+          [(ngModel)]="formData.paymentDate" 
+          name="paymentDate"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">طريقة الدفع *</label>
+        <select class="form-control" [(ngModel)]="formData.paymentMethod" name="paymentMethod" required>
+          <option value="Bank Transfer">تحويل بنكي</option>
+          <option value="Check">شيك</option>
+          <option value="Cash">نقدي</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">ملاحظات التحقق</label>
+        <textarea 
+          class="form-control" 
+          [(ngModel)]="formData.verificationNotes" 
+          name="verificationNotes"
+          rows="4"
+          maxlength="500"
+          placeholder="أدخل أي ملاحظات للتحقق..."
+        ></textarea>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button 
+          type="submit" 
+          class="btn btn-success" 
+          [disabled]="submitting"
+          style="flex: 1;"
+        >
+          {{ submitting ? 'جاري الحفظ...' : 'حفظ الدفعة' }}
+        </button>
+        <button 
+          type="button" 
+          class="btn" 
+          (click)="cancel()"
+          [disabled]="submitting"
+          style="flex: 1; background: #6c757d; color: white;"
+        >
+          إلغاء
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card" style="background: #e7f3ff; border-right: 4px solid var(--info-color);">
+    <h3>📋 معلومات مهمة</h3>
+    <ul style="margin: 12px 0; padding-right: 20px;">
+      <li>يتم إنشاء الدفعة من إيصال استلام محدد</li>
+      <li>يجب التحقق من المستندات والكمية والسعر قبل معالجة الدفع</li>
+      <li>سيتم إنشاء مرجع معاملة تلقائياً</li>
+      <li>بعد معالجة الدفع، يتم أرشفة السجل للرجوع إليه لاحقاً</li>
+    </ul>
+  </div>
+</div>

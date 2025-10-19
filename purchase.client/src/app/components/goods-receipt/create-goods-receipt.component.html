@@ -1,0 +1,118 @@
+<div class="container">
+  <h1>إنشاء إيصال استلام جديد</h1>
+
+  <div class="card">
+    <h2>الخطوة 7: استلام البضائع وإدارة المخزون</h2>
+    <p>قم بملء النموذج التالي لتسجيل استلام البضائع</p>
+
+    <div *ngIf="loading" class="loading">
+      <p>جاري التحميل...</p>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+
+    <div *ngIf="successMessage" class="success-message">
+      {{ successMessage }}
+    </div>
+
+    <form *ngIf="!loading" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label class="form-label">أمر الشراء *</label>
+        <select class="form-control" [(ngModel)]="formData.purchaseOrderId" name="purchaseOrderId" required>
+          <option [value]="0">-- اختر أمر الشراء --</option>
+          <option *ngFor="let order of purchaseOrders" [value]="order.id">
+            {{ order.orderNumber }} - {{ order.toolNameAr }} - {{ order.supplierNameAr }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">الكمية المستلمة *</label>
+        <input 
+          type="number" 
+          class="form-control" 
+          [(ngModel)]="formData.receivedQuantity" 
+          name="receivedQuantity"
+          min="1"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">حالة الجودة *</label>
+        <select class="form-control" [(ngModel)]="formData.qualityStatus" name="qualityStatus" required>
+          <option value="Accepted">مقبول</option>
+          <option value="Rejected">مرفوض</option>
+          <option value="PartiallyAccepted">مقبول جزئياً</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">ملاحظات الجودة</label>
+        <textarea 
+          class="form-control" 
+          [(ngModel)]="formData.qualityNotes" 
+          name="qualityNotes"
+          rows="3"
+          maxlength="500"
+          placeholder="أدخل ملاحظات الجودة..."
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">ملاحظات الحالة</label>
+        <textarea 
+          class="form-control" 
+          [(ngModel)]="formData.conditionNotes" 
+          name="conditionNotes"
+          rows="3"
+          maxlength="500"
+          placeholder="أدخل ملاحظات الحالة..."
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">مستند إثبات الاستلام</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          [(ngModel)]="formData.proofOfReceiptDocument" 
+          name="proofOfReceiptDocument"
+          placeholder="رابط أو اسم مستند إثبات الاستلام"
+        />
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button 
+          type="submit" 
+          class="btn btn-success" 
+          [disabled]="submitting"
+          style="flex: 1;"
+        >
+          {{ submitting ? 'جاري الحفظ...' : 'حفظ الإيصال' }}
+        </button>
+        <button 
+          type="button" 
+          class="btn" 
+          (click)="cancel()"
+          [disabled]="submitting"
+          style="flex: 1; background: #6c757d; color: white;"
+        >
+          إلغاء
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card" style="background: #e7f3ff; border-right: 4px solid var(--info-color);">
+    <h3>📋 معلومات مهمة</h3>
+    <ul style="margin: 12px 0; padding-right: 20px;">
+      <li>يتم تسجيل استلام البضائع من أمر شراء محدد</li>
+      <li>سيتم فحص الجودة والكمية المستلمة</li>
+      <li>يتم تحديث المخزون تلقائياً بعد التحقق من الكمية</li>
+      <li>بعد استلام البضائع، انتقل إلى الخطوة 8 (معالجة الدفع)</li>
+    </ul>
+  </div>
+</div>

@@ -12,8 +12,14 @@ import { CreateToolRequestComponent } from './components/tool-request/create-too
 import { PurchaseRequestListComponent } from './components/purchase-request/purchase-request-list.component';
 import { QuotationListComponent } from './components/quotation/quotation-list.component';
 import { PurchaseOrderListComponent } from './components/purchase-order/purchase-order-list.component';
+import { CreatePurchaseOrderComponent } from './components/purchase-order/create-purchase-order.component';
+import { PurchaseOrderDetailComponent } from './components/purchase-order/purchase-order-detail.component';
 import { GoodsReceiptListComponent } from './components/goods-receipt/goods-receipt-list.component';
+import { CreateGoodsReceiptComponent } from './components/goods-receipt/create-goods-receipt.component';
+import { GoodsReceiptDetailComponent } from './components/goods-receipt/goods-receipt-detail.component';
 import { PaymentListComponent } from './components/payment/payment-list.component';
+import { CreatePaymentComponent } from './components/payment/create-payment.component';
+import { PaymentDetailComponent } from './components/payment/payment-detail.component';
 
 @NgModule({
   declarations: [
@@ -24,8 +30,14 @@ import { PaymentListComponent } from './components/payment/payment-list.componen
     PurchaseRequestListComponent,
     QuotationListComponent,
     PurchaseOrderListComponent,
+    CreatePurchaseOrderComponent,
+    PurchaseOrderDetailComponent,
     GoodsReceiptListComponent,
-    PaymentListComponent
+    CreateGoodsReceiptComponent,
+    GoodsReceiptDetailComponent,
+    PaymentListComponent,
+    CreatePaymentComponent,
+    PaymentDetailComponent
   ],
   imports: [
     BrowserModule,

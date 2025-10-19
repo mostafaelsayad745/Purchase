@@ -20,12 +20,20 @@
     <form *ngIf="!loading" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label class="form-label">الأداة المطلوبة *</label>
-        <select class="form-control" [(ngModel)]="formData.toolId" name="toolId" required>
-          <option value="0">-- اختر الأداة --</option>
-          <option *ngFor="let item of stockItems" [value]="item.id">
+        <input 
+          type="text" 
+          list="toolsList"
+          class="form-control" 
+          [(ngModel)]="formData.toolName" 
+          name="toolName"
+          required
+          placeholder="أدخل اسم الأداة أو اختر من القائمة"
+        />
+        <datalist id="toolsList">
+          <option *ngFor="let item of stockItems" [value]="item.nameAr">
             {{ item.nameAr }} ({{ item.toolId }}) - المتاح: {{ item.currentQuantity }} {{ item.unit }}
           </option>
-        </select>
+        </datalist>
       </div>
 
       <div class="form-group">
@@ -42,12 +50,20 @@
 
       <div class="form-group">
         <label class="form-label">منطقة العمل *</label>
-        <select class="form-control" [(ngModel)]="formData.workAreaId" name="workAreaId" required>
-          <option value="0">-- اختر منطقة العمل --</option>
-          <option *ngFor="let area of workAreas" [value]="area.id">
+        <input 
+          type="text" 
+          list="workAreasList"
+          class="form-control" 
+          [(ngModel)]="formData.workAreaName" 
+          name="workAreaName"
+          required
+          placeholder="أدخل اسم منطقة العمل أو اختر من القائمة"
+        />
+        <datalist id="workAreasList">
+          <option *ngFor="let area of workAreas" [value]="area.nameAr">
             {{ area.nameAr }}
           </option>
-        </select>
+        </datalist>
       </div>
 
       <div class="form-group">

@@ -16,10 +16,10 @@ export class CreateToolRequestComponent implements OnInit {
   error: string | null = null;
   successMessage: string | null = null;
 
-  formData: CreateToolRequestDto = {
-    toolId: 0,
+  formData: any = {
+    toolName: '',
+    workAreaName: '',
     quantityNeeded: 1,
-    workAreaId: 0,
     reasonAr: '',
     reasonEn: ''
   };
@@ -69,7 +69,32 @@ export class CreateToolRequestComponent implements OnInit {
     this.error = null;
     this.successMessage = null;
 
-    this.toolRequestService.createToolRequest(this.formData).subscribe({
+    // Try to find matching tool and work area
+    const matchingTool = this.stockItems.find(item => item.nameAr === this.formData.toolName);
+    const matchingWorkArea = this.workAreas.find(area => area.nameAr === this.formData.workAreaName);
+
+    if (!matchingTool) {
+      this.error = 'لم يتم العثور على الأداة المحددة. الرجاء اختيار أداة من القائمة.';
+      this.submitting = false;
+      return;
+    }
+
+    if (!matchingWorkArea) {
+      this.error = 'لم يتم العثور على منطقة العمل المحددة. الرجاء اختيار منطقة عمل من القائمة.';
+      this.submitting = false;
+      return;
+    }
+
+    // Create the request DTO with IDs
+    const requestDto = {
+      toolId: matchingTool.id,
+      quantityNeeded: this.formData.quantityNeeded,
+      workAreaId: matchingWorkArea.id,
+      reasonAr: this.formData.reasonAr,
+      reasonEn: this.formData.reasonEn
+    };
+
+    this.toolRequestService.createToolRequest(requestDto).subscribe({
       next: (response) => {
         this.successMessage = 'تم إنشاء الطلب بنجاح!';
         this.submitting = false;
@@ -88,16 +113,16 @@ export class CreateToolRequestComponent implements OnInit {
   }
 
   validateForm(): boolean {
-    if (this.formData.toolId === 0) {
-      this.error = 'الرجاء اختيار الأداة';
+    if (!this.formData.toolName || !this.formData.toolName.trim()) {
+      this.error = 'الرجاء إدخال اسم الأداة';
       return false;
     }
     if (this.formData.quantityNeeded < 1) {
       this.error = 'الرجاء إدخال كمية صحيحة';
       return false;
     }
-    if (this.formData.workAreaId === 0) {
-      this.error = 'الرجاء اختيار منطقة العمل';
+    if (!this.formData.workAreaName || !this.formData.workAreaName.trim()) {
+      this.error = 'الرجاء إدخال اسم منطقة العمل';
       return false;
     }
     if (!this.formData.reasonAr.trim()) {

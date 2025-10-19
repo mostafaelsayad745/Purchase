@@ -1,0 +1,68 @@
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { PurchaseOrderService, PurchaseOrder } from '../../services/purchase-order.service';
+
+@Component({
+  selector: 'app-purchase-order-detail',
+  templateUrl: './purchase-order-detail.component.html',
+  styleUrls: ['./purchase-order-detail.component.css']
+})
+export class PurchaseOrderDetailComponent implements OnInit {
+  purchaseOrder: PurchaseOrder | null = null;
+  loading = false;
+  error: string | null = null;
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private purchaseOrderService: PurchaseOrderService
+  ) { }
+
+  ngOnInit(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (id) {
+      this.loadPurchaseOrder(id);
+    }
+  }
+
+  loadPurchaseOrder(id: number): void {
+    this.loading = true;
+    this.error = null;
+
+    this.purchaseOrderService.getPurchaseOrder(id).subscribe({
+      next: (data) => {
+        this.purchaseOrder = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'فشل في تحميل تفاصيل أمر الشراء';
+        this.loading = false;
+        console.error('Error loading purchase order:', err);
+      }
+    });
+  }
+
+  goBack(): void {
+    this.router.navigate(['/purchase-orders']);
+  }
+
+  getStatusText(status: string): string {
+    switch (status) {
+      case 'Created': return 'تم الإنشاء';
+      case 'Received': return 'تم الاستلام';
+      case 'Inspected': return 'تم الفحص';
+      case 'Paid': return 'تم الدفع';
+      default: return status;
+    }
+  }
+
+  getStatusColor(status: string): string {
+    switch (status) {
+      case 'Created': return 'status-pending';
+      case 'Received': return 'status-in-progress';
+      case 'Inspected': return 'status-approved';
+      case 'Paid': return 'status-fulfilled';
+      default: return '';
+    }
+  }
+}

@@ -1,0 +1,142 @@
+<div class="container">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h1>تفاصيل الدفعة</h1>
+    <button class="btn" (click)="goBack()" style="background: #6c757d; color: white;">
+      ← العودة للقائمة
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <p>جاري التحميل...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error && payment">
+    <div class="card">
+      <h2>معلومات الدفعة</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+        <div>
+          <strong>مرجع المعاملة:</strong>
+          <p>{{ payment.transactionReference }}</p>
+        </div>
+        <div>
+          <strong>الحالة:</strong>
+          <p>
+            <span [class]="'status-badge ' + getStatusColor(payment.status)">
+              {{ getStatusText(payment.status) }}
+            </span>
+          </p>
+        </div>
+        <div>
+          <strong>المبلغ:</strong>
+          <p style="font-size: 20px; color: var(--success-color); font-weight: bold;">
+            {{ payment.amount | number:'1.2-2' }} ريال
+          </p>
+        </div>
+        <div>
+          <strong>تاريخ الدفع:</strong>
+          <p>{{ payment.paymentDate | date:'yyyy-MM-dd' }}</p>
+        </div>
+        <div>
+          <strong>طريقة الدفع:</strong>
+          <p>{{ getPaymentMethodText(payment.paymentMethod) }}</p>
+        </div>
+        <div>
+          <strong>تمت المعالجة بواسطة:</strong>
+          <p>{{ payment.processedByNameAr || '-' }}</p>
+        </div>
+        <div *ngIf="payment.processedDate">
+          <strong>تاريخ المعالجة:</strong>
+          <p>{{ payment.processedDate | date:'yyyy-MM-dd HH:mm' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>حالة التحقق</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+        <div>
+          <strong>تحقق المستندات:</strong>
+          <p>
+            <span *ngIf="payment.documentsVerified" style="color: green;">✓ تم التحقق</span>
+            <span *ngIf="!payment.documentsVerified" style="color: orange;">⚠ لم يتم التحقق</span>
+          </p>
+        </div>
+        <div>
+          <strong>تحقق الكمية:</strong>
+          <p>
+            <span *ngIf="payment.quantityVerified" style="color: green;">✓ تم التحقق</span>
+            <span *ngIf="!payment.quantityVerified" style="color: orange;">⚠ لم يتم التحقق</span>
+          </p>
+        </div>
+        <div>
+          <strong>تحقق السعر:</strong>
+          <p>
+            <span *ngIf="payment.priceVerified" style="color: green;">✓ تم التحقق</span>
+            <span *ngIf="!payment.priceVerified" style="color: orange;">⚠ لم يتم التحقق</span>
+          </p>
+        </div>
+      </div>
+      <div *ngIf="payment.verificationNotes" style="margin-top: 16px;">
+        <strong>ملاحظات التحقق:</strong>
+        <p>{{ payment.verificationNotes }}</p>
+      </div>
+    </div>
+
+    <div class="card" *ngIf="payment.goodsReceipt">
+      <h2>معلومات إيصال الاستلام</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+        <div>
+          <strong>رقم أمر الشراء:</strong>
+          <p>{{ payment.goodsReceipt.purchaseOrder?.orderNumber }}</p>
+        </div>
+        <div>
+          <strong>تاريخ الاستلام:</strong>
+          <p>{{ payment.goodsReceipt.receivedDate | date:'yyyy-MM-dd' }}</p>
+        </div>
+        <div>
+          <strong>الكمية المستلمة:</strong>
+          <p>{{ payment.goodsReceipt.receivedQuantity }} قطعة</p>
+        </div>
+        <div>
+          <strong>حالة الجودة:</strong>
+          <p>{{ payment.goodsReceipt.qualityStatus }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>حالة الأرشفة</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+        <div>
+          <strong>مؤرشف:</strong>
+          <p>
+            <span *ngIf="payment.isArchived" style="color: green;">✓ تم الأرشفة</span>
+            <span *ngIf="!payment.isArchived" style="color: orange;">⚠ لم يتم الأرشفة</span>
+          </p>
+        </div>
+        <div *ngIf="payment.archiveDate">
+          <strong>تاريخ الأرشفة:</strong>
+          <p>{{ payment.archiveDate | date:'yyyy-MM-dd HH:mm' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>التواريخ</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+        <div>
+          <strong>تاريخ الإنشاء:</strong>
+          <p>{{ payment.createdAt | date:'yyyy-MM-dd HH:mm' }}</p>
+        </div>
+        <div>
+          <strong>آخر تحديث:</strong>
+          <p>{{ payment.updatedAt | date:'yyyy-MM-dd HH:mm' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

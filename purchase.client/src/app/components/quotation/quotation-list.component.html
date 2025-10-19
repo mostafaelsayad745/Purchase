@@ -1,17 +1,85 @@
 <div class="container">
-  <div class="page-header">
-    <h2>💰 عروض الأسعار</h2>
-    <p class="subtitle">Quotations - Steps 4-5: Supplier Selection & Best Offer Approval</p>
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h2>💰 عروض الأسعار</h2>
+      <p class="subtitle">Quotations - Steps 4-5: Supplier Selection & Best Offer Approval</p>
+    </div>
+    <button class="btn btn-primary" (click)="showCreateForm = !showCreateForm">
+      {{ showCreateForm ? 'إخفاء النموذج' : '+ إضافة عرض سعر يدوياً' }}
+    </button>
+  </div>
+
+  <!-- Manual Create Form -->
+  <div *ngIf="showCreateForm" class="card" style="background: #f8f9fa; margin-bottom: 20px;">
+    <h3>إضافة عرض سعر جديد</h3>
+    <form (ngSubmit)="createQuotation()">
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">طلب الشراء *</label>
+          <select class="form-control" [(ngModel)]="newQuotation.purchaseRequestId" name="purchaseRequestId" required>
+            <option [value]="0">-- اختر طلب الشراء --</option>
+            <option *ngFor="let pr of purchaseRequests" [value]="pr.id">
+              {{ pr.toolNameAr }} (طلب #{{ pr.id }})
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">المورد *</label>
+          <select class="form-control" [(ngModel)]="newQuotation.supplierId" name="supplierId" required>
+            <option [value]="0">-- اختر المورد --</option>
+            <option *ngFor="let supplier of suppliers" [value]="supplier.id">
+              {{ supplier.nameAr }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الكمية المعروضة *</label>
+          <input type="number" class="form-control" [(ngModel)]="newQuotation.quantityOffered" name="quantityOffered" min="1" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">سعر الوحدة (ريال) *</label>
+          <input type="number" class="form-control" [(ngModel)]="newQuotation.unitPrice" name="unitPrice" min="0.01" step="0.01" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">مدة التسليم (أيام) *</label>
+          <input type="number" class="form-control" [(ngModel)]="newQuotation.deliveryTimeDays" name="deliveryTimeDays" min="1" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">ملاحظات</label>
+          <textarea class="form-control" [(ngModel)]="newQuotation.notes" name="notes" rows="2"></textarea>
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <button type="submit" class="btn btn-success" [disabled]="creating">
+          {{ creating ? 'جاري الحفظ...' : 'حفظ العرض' }}
+        </button>
+        <button type="button" class="btn" (click)="showCreateForm = false; resetForm()" style="background: #6c757d; color: white;">
+          إلغاء
+        </button>
+      </div>
+    </form>
   </div>
 
   <div class="filter-section">
-    <label for="prFilter">تصفية حسب طلب الشراء:</label>
-    <select id="prFilter" [(ngModel)]="selectedPurchaseRequestId" (change)="filterByPurchaseRequest()">
-      <option [ngValue]="null">الكل</option>
-      <option *ngFor="let pr of purchaseRequests" [ngValue]="pr.id">
-        {{ pr.toolNameAr }} (طلب #{{ pr.id }})
-      </option>
-    </select>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+      <div>
+        <label for="prFilter">تصفية حسب طلب الشراء:</label>
+        <select id="prFilter" class="form-control" [(ngModel)]="selectedPurchaseRequestId" (change)="filterByPurchaseRequest()">
+          <option [ngValue]="null">الكل</option>
+          <option *ngFor="let pr of purchaseRequests" [ngValue]="pr.id">
+            {{ pr.toolNameAr }} (طلب #{{ pr.id }})
+          </option>
+        </select>
+      </div>
+      <div>
+        <label for="supplierFilter">تصفية حسب المورد:</label>
+        <input type="text" id="supplierFilter" class="form-control" [(ngModel)]="filterSupplierName" (input)="applyFilters()" placeholder="ابحث عن المورد..." />
+      </div>
+      <div>
+        <label for="dateFilter">تصفية حسب التاريخ:</label>
+        <input type="date" id="dateFilter" class="form-control" [(ngModel)]="filterDate" (change)="applyFilters()" />
+      </div>
+    </div>
   </div>
 
   <div *ngIf="loading" class="loading">
@@ -120,6 +188,51 @@
       <li><strong>المسؤول:</strong> SecondApprover (الموافق الثاني)</li>
       <li><strong>معايير الاختيار:</strong> السعر، وقت التسليم، تقييم المورد، جودة المنتج</li>
       <li><strong>بعد الاختيار:</strong> الانتقال إلى الخطوة 6 (إنشاء أمر الشراء)</li>
+      <li><strong>الأرشفة:</strong> عند الموافقة على عرض معين، يتم أرشفة جميع العروض الأخرى للرجوع إليها لاحقاً</li>
     </ul>
+  </div>
+
+  <!-- Archived Quotations Section -->
+  <div class="card" *ngIf="archivedQuotations.length > 0" style="background: #fff3cd; border-right: 4px solid #ffc107;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3>📦 العروض المؤرشفة</h3>
+      <button class="btn" (click)="showArchived = !showArchived" style="background: #ffc107; color: #000;">
+        {{ showArchived ? 'إخفاء الأرشيف' : 'عرض الأرشيف' }}
+      </button>
+    </div>
+    
+    <div *ngIf="showArchived">
+      <p>إجمالي العروض المؤرشفة: {{ archivedQuotations.length }}</p>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px;">
+        <div *ngFor="let archived of archivedQuotations" class="quotation-card" style="background: #f8f9fa; border: 1px solid #dee2e6;">
+          <div style="background: #ffc107; padding: 4px 8px; border-radius: 4px; margin-bottom: 8px;">
+            <strong>مؤرشف في: {{ archived.archivedDate | date:'yyyy-MM-dd HH:mm' }}</strong>
+          </div>
+          <div class="supplier-section">
+            <h4>{{ archived.supplierNameAr }}</h4>
+            <p class="supplier-name-en">{{ archived.supplierNameEn }}</p>
+          </div>
+          <div class="details-section">
+            <div class="detail-row">
+              <span class="label">الكمية المعروضة:</span>
+              <span class="value">{{ archived.quantityOffered }} قطعة</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">السعر الإجمالي:</span>
+              <span class="value total-price">{{ archived.totalPrice | number:'1.2-2' }} ريال</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">تاريخ العرض:</span>
+              <span class="value">{{ archived.quotationDate | date:'yyyy-MM-dd' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">سبب الأرشفة:</span>
+              <span class="value">{{ archived.archivedReason }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

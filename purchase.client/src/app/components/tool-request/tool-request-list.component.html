@@ -8,14 +8,26 @@
 
   <div class="card">
     <div style="margin-bottom: 20px;">
-      <label class="form-label">تصفية حسب الحالة:</label>
-      <select class="form-control" [(ngModel)]="selectedStatus" (change)="filterByStatus()" style="max-width: 300px;">
-        <option value="">جميع الحالات</option>
-        <option value="Pending">قيد الانتظار</option>
-        <option value="InStock">متوفر في المخزون</option>
-        <option value="OutOfStock">غير متوفر</option>
-        <option value="Rejected">مرفوض</option>
-      </select>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+        <div>
+          <label class="form-label">تصفية حسب الحالة:</label>
+          <select class="form-control" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+            <option value="">جميع الحالات</option>
+            <option value="Pending">قيد الانتظار</option>
+            <option value="InStock">متوفر في المخزون</option>
+            <option value="OutOfStock">غير متوفر</option>
+            <option value="Rejected">مرفوض</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">البحث باسم الأداة:</label>
+          <input type="text" class="form-control" [(ngModel)]="filterToolName" (input)="applyFilters()" placeholder="ابحث عن الأداة..." />
+        </div>
+        <div>
+          <label class="form-label">تصفية حسب التاريخ:</label>
+          <input type="date" class="form-control" [(ngModel)]="filterDate" (change)="applyFilters()" />
+        </div>
+      </div>
     </div>
 
     <div *ngIf="loading" class="loading">
@@ -30,7 +42,7 @@
       <p>لا توجد طلبات متاحة</p>
     </div>
 
-    <table class="table" *ngIf="!loading && !error && toolRequests.length > 0">
+    <table class="table" *ngIf="!loading && !error && paginatedRequests.length > 0">
       <thead>
         <tr>
           <th>#</th>
@@ -46,7 +58,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let request of toolRequests">
+        <tr *ngFor="let request of paginatedRequests">
           <td>{{ request.id }}</td>
           <td>TOOL-{{ ('000' + request.toolId).slice(-3) }}</td>
           <td>{{ request.toolNameAr }}</td>
@@ -68,5 +80,32 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Pagination Controls -->
+    <div *ngIf="!loading && !error && filteredRequests.length > 0" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+      <div>
+        عرض {{ startIndex + 1 }} إلى {{ endIndex }} من أصل {{ filteredRequests.length }} طلب
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn" (click)="previousPage()" [disabled]="currentPage === 1" style="background: #6c757d; color: white;">
+          السابق
+        </button>
+        <span style="padding: 8px 16px; background: #f0f0f0; border-radius: 4px;">
+          صفحة {{ currentPage }} من {{ totalPages }}
+        </span>
+        <button class="btn" (click)="nextPage()" [disabled]="currentPage === totalPages" style="background: #6c757d; color: white;">
+          التالي
+        </button>
+      </div>
+      <div>
+        <label style="margin-left: 8px;">عدد النتائج:</label>
+        <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc;">
+          <option [value]="10">10</option>
+          <option [value]="25">25</option>
+          <option [value]="50">50</option>
+          <option [value]="100">100</option>
+        </select>
+      </div>
+    </div>
   </div>
 </div>

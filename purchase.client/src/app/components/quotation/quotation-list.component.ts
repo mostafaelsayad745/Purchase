@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { QuotationService, Quotation } from '../../services/quotation.service';
+import { QuotationService, Quotation, CreateQuotationDto } from '../../services/quotation.service';
 import { PurchaseRequestService, PurchaseRequest } from '../../services/purchase-request.service';
+import { MasterDataService, Supplier } from '../../services/master-data.service';
 
 @Component({
   selector: 'app-quotation-list',
@@ -10,21 +11,41 @@ import { PurchaseRequestService, PurchaseRequest } from '../../services/purchase
 })
 export class QuotationListComponent implements OnInit {
   quotations: Quotation[] = [];
+  filteredQuotations: Quotation[] = [];
   purchaseRequests: PurchaseRequest[] = [];
+  suppliers: Supplier[] = [];
+  archivedQuotations: any[] = [];
   loading = false;
+  creating = false;
   error: string | null = null;
   selectedPurchaseRequestId: number | null = null;
   groupedQuotations: Map<number, Quotation[]> = new Map();
+  showCreateForm = false;
+  showArchived = false;
+  filterSupplierName = '';
+  filterDate = '';
+  
+  newQuotation: CreateQuotationDto = {
+    purchaseRequestId: 0,
+    supplierId: 0,
+    quantityOffered: 0,
+    unitPrice: 0,
+    deliveryTimeDays: 0,
+    notes: ''
+  };
 
   constructor(
     private quotationService: QuotationService,
     private purchaseRequestService: PurchaseRequestService,
+    private masterDataService: MasterDataService,
     private router: Router
   ) {}
 
   ngOnInit() {
     this.loadApprovedPurchaseRequests();
     this.loadQuotations();
+    this.loadSuppliers();
+    this.loadArchivedQuotations();
   }
 
   loadApprovedPurchaseRequests() {
@@ -45,6 +66,7 @@ export class QuotationListComponent implements OnInit {
     this.quotationService.getQuotations(this.selectedPurchaseRequestId || undefined).subscribe({
       next: (data) => {
         this.quotations = data;
+        this.filteredQuotations = data;
         this.groupQuotationsByPurchaseRequest();
         this.loading = false;
       },
@@ -58,7 +80,7 @@ export class QuotationListComponent implements OnInit {
 
   groupQuotationsByPurchaseRequest() {
     this.groupedQuotations.clear();
-    this.quotations.forEach(q => {
+    this.filteredQuotations.forEach(q => {
       if (!this.groupedQuotations.has(q.purchaseRequestId)) {
         this.groupedQuotations.set(q.purchaseRequestId, []);
       }
@@ -98,7 +120,9 @@ export class QuotationListComponent implements OnInit {
         selectionReason: reason
       }).subscribe({
         next: () => {
-          alert('تم اختيار العرض بنجاح');
+          alert('تم اختيار العرض بنجاح. سيتم أرشفة جميع العروض الأخرى لهذا الطلب.');
+          // Archive all other quotations for this purchase request
+          this.archiveOtherQuotations(quotation.purchaseRequestId, quotation.id);
           this.loadQuotations();
         },
         error: (err) => {
@@ -107,6 +131,26 @@ export class QuotationListComponent implements OnInit {
         }
       });
     }
+  }
+
+  archiveOtherQuotations(purchaseRequestId: number, selectedQuotationId: number) {
+    // Filter quotations for the same purchase request that were not selected
+    const quotationsToArchive = this.quotations.filter(
+      q => q.purchaseRequestId === purchaseRequestId && 
+           q.id !== selectedQuotationId && 
+           !q.isSelected
+    );
+    
+    // Store archived quotations in localStorage for later retrieval
+    const archivedQuotations = JSON.parse(localStorage.getItem('archivedQuotations') || '[]');
+    quotationsToArchive.forEach(q => {
+      archivedQuotations.push({
+        ...q,
+        archivedDate: new Date().toISOString(),
+        archivedReason: 'تم اختيار عرض آخر'
+      });
+    });
+    localStorage.setItem('archivedQuotations', JSON.stringify(archivedQuotations));
   }
 
   rejectQuotation(quotation: Quotation) {
@@ -135,5 +179,84 @@ export class QuotationListComponent implements OnInit {
 
   getGroupKeys(): number[] {
     return Array.from(this.groupedQuotations.keys());
+  }
+
+  loadSuppliers() {
+    this.masterDataService.getSuppliers().subscribe({
+      next: (data) => {
+        this.suppliers = data;
+      },
+      error: (err) => {
+        console.error('Error loading suppliers:', err);
+      }
+    });
+  }
+
+  createQuotation() {
+    if (this.newQuotation.purchaseRequestId === 0 || this.newQuotation.supplierId === 0) {
+      alert('الرجاء ملء جميع الحقول المطلوبة');
+      return;
+    }
+
+    this.creating = true;
+    this.quotationService.createQuotation(this.newQuotation).subscribe({
+      next: () => {
+        alert('تم إضافة عرض السعر بنجاح');
+        this.showCreateForm = false;
+        this.resetForm();
+        this.loadQuotations();
+        this.creating = false;
+      },
+      error: (err) => {
+        console.error('Error creating quotation:', err);
+        alert('حدث خطأ في إضافة عرض السعر');
+        this.creating = false;
+      }
+    });
+  }
+
+  resetForm() {
+    this.newQuotation = {
+      purchaseRequestId: 0,
+      supplierId: 0,
+      quantityOffered: 0,
+      unitPrice: 0,
+      deliveryTimeDays: 0,
+      notes: ''
+    };
+  }
+
+  applyFilters() {
+    this.filteredQuotations = this.quotations.filter(q => {
+      const matchesSupplier = !this.filterSupplierName || 
+        q.supplierNameAr.includes(this.filterSupplierName) || 
+        q.supplierNameEn.toLowerCase().includes(this.filterSupplierName.toLowerCase());
+      
+      const matchesDate = !this.filterDate || 
+        q.quotationDate.startsWith(this.filterDate);
+      
+      return matchesSupplier && matchesDate;
+    });
+    this.groupQuotationsByPurchaseRequest();
+  }
+
+  loadArchivedQuotations() {
+    const archived = localStorage.getItem('archivedQuotations');
+    if (archived) {
+      this.archivedQuotations = JSON.parse(archived);
+      // Apply filters to archived quotations as well
+      if (this.filterSupplierName || this.filterDate) {
+        this.archivedQuotations = this.archivedQuotations.filter(q => {
+          const matchesSupplier = !this.filterSupplierName || 
+            q.supplierNameAr.includes(this.filterSupplierName) || 
+            q.supplierNameEn.toLowerCase().includes(this.filterSupplierName.toLowerCase());
+          
+          const matchesDate = !this.filterDate || 
+            q.quotationDate.startsWith(this.filterDate);
+          
+          return matchesSupplier && matchesDate;
+        });
+      }
+    }
   }
 }
