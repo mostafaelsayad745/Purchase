@@ -1,0 +1,31 @@
+# .NET build artifacts
+**/bin/
+**/obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.pdb
+*.userosscache
+*.sln.docstates
+
+# Node modules
+**/node_modules/
+**/dist/
+**/.angular/
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# IDE
+.vs/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db

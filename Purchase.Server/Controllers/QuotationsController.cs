@@ -204,7 +204,7 @@ public class QuotationsController : ControllerBase
             var quotations = await query
                 .OrderBy(q => q.PurchaseRequestId)
                 .ThenBy(q => q.Ranking ?? 999)
-                .ThenBy(q => q.TotalPrice)
+                .ThenBy(q => (double)q.TotalPrice)
                 .Select(q => new QuotationDto
                 {
                     Id = q.Id,
