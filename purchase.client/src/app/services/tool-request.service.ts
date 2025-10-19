@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface ToolRequest {
   id: number;
@@ -42,7 +43,7 @@ export interface StockVerificationDto {
   providedIn: 'root'
 })
 export class ToolRequestService {
-  private apiUrl = '/api/toolrequests';
+  private apiUrl = `${environment.apiUrl}/toolrequests`;
 
   constructor(private http: HttpClient) { }
 

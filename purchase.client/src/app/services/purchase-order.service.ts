@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface PurchaseOrder {
   id: number;
@@ -52,7 +53,7 @@ export interface UpdatePurchaseOrderDto {
   providedIn: 'root'
 })
 export class PurchaseOrderService {
-  private apiUrl = '/api/purchaseorders';
+  private apiUrl = `${environment.apiUrl}/purchaseorders`;
 
   constructor(private http: HttpClient) { }
 
