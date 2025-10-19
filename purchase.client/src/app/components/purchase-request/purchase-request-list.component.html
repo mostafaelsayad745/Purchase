@@ -1,0 +1,97 @@
+<div class="container">
+  <div class="page-header">
+    <h2>📋 طلبات الشراء</h2>
+    <p class="subtitle">Purchase Requests - Step 3: First Approval</p>
+  </div>
+
+  <div class="filter-section">
+    <label for="statusFilter">تصفية حسب الحالة:</label>
+    <select id="statusFilter" [(ngModel)]="selectedStatus" (change)="filterByStatus()">
+      <option value="">الكل</option>
+      <option value="PendingApproval">في انتظار الموافقة</option>
+      <option value="Approved">موافق عليه</option>
+      <option value="Rejected">مرفوض</option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>جاري التحميل...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error" class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>رقم الطلب</th>
+          <th>اسم الأداة</th>
+          <th>الكمية المطلوبة</th>
+          <th>تاريخ الطلب</th>
+          <th>الحالة</th>
+          <th>الموافق</th>
+          <th>تاريخ الموافقة</th>
+          <th>الميزانية المقدرة</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let request of purchaseRequests">
+          <td>{{ request.id }}</td>
+          <td class="tool-name">{{ request.toolNameAr }}</td>
+          <td>{{ request.quantityNeeded }}</td>
+          <td>{{ request.requestDate | date: 'yyyy-MM-dd HH:mm' }}</td>
+          <td>
+            <span [class]="'badge ' + getStatusClass(request.status)">
+              {{ getStatusText(request.status) }}
+            </span>
+          </td>
+          <td>{{ request.approvedByNameAr || '-' }}</td>
+          <td>{{ request.approvalDate ? (request.approvalDate | date: 'yyyy-MM-dd HH:mm') : '-' }}</td>
+          <td>{{ request.estimatedBudget || '-' }} ريال</td>
+          <td>
+            <div class="action-buttons">
+              <button 
+                *ngIf="request.status === 'PendingApproval'"
+                class="btn btn-success btn-sm"
+                (click)="approveRequest(request)"
+                title="الموافقة">
+                ✓ موافقة
+              </button>
+              <button 
+                *ngIf="request.status === 'PendingApproval'"
+                class="btn btn-danger btn-sm"
+                (click)="rejectRequest(request)"
+                title="رفض">
+                ✗ رفض
+              </button>
+              <button 
+                class="btn btn-info btn-sm"
+                (click)="viewDetails(request.id)"
+                title="التفاصيل">
+                👁 عرض
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="purchaseRequests.length === 0">
+          <td colspan="9" class="no-data">لا توجد طلبات شراء</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-section">
+    <h3>📖 معلومات عن طلبات الشراء</h3>
+    <ul>
+      <li><strong>الخطوة 3:</strong> الموافقة الأولى على طلب الشراء</li>
+      <li><strong>المسؤول:</strong> FirstApprover (الموافق الأول)</li>
+      <li><strong>العملية:</strong> مراجعة الطلب والموافقة عليه أو رفضه</li>
+      <li><strong>المتطلبات:</strong> تاريخ الموافقة، هوية الموافق، ملاحظات</li>
+      <li><strong>بعد الموافقة:</strong> الانتقال إلى الخطوة 4 (عروض الأسعار)</li>
+    </ul>
+  </div>
+</div>

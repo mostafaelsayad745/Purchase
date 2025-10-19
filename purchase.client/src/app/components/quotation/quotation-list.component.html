@@ -1,0 +1,125 @@
+<div class="container">
+  <div class="page-header">
+    <h2>💰 عروض الأسعار</h2>
+    <p class="subtitle">Quotations - Steps 4-5: Supplier Selection & Best Offer Approval</p>
+  </div>
+
+  <div class="filter-section">
+    <label for="prFilter">تصفية حسب طلب الشراء:</label>
+    <select id="prFilter" [(ngModel)]="selectedPurchaseRequestId" (change)="filterByPurchaseRequest()">
+      <option [ngValue]="null">الكل</option>
+      <option *ngFor="let pr of purchaseRequests" [ngValue]="pr.id">
+        {{ pr.toolNameAr }} (طلب #{{ pr.id }})
+      </option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>جاري التحميل...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error">
+    <!-- Grouped by Purchase Request -->
+    <div *ngFor="let prId of getGroupKeys()" class="pr-group">
+      <h3 class="pr-header">
+        🛠️ {{ getPurchaseRequestName(prId) }}
+        <span class="quote-count">{{ groupedQuotations.get(prId)?.length }} عرض</span>
+      </h3>
+      
+      <div class="quotations-grid">
+        <div *ngFor="let quotation of groupedQuotations.get(prId)" 
+             class="quotation-card"
+             [class.selected]="quotation.isSelected"
+             [class]="getRankingClass(quotation.ranking)">
+          
+          <!-- Ranking Badge -->
+          <div *ngIf="quotation.ranking && quotation.ranking <= 3" class="ranking-badge">
+            {{ getRankingBadge(quotation.ranking) }}
+          </div>
+
+          <!-- Supplier Info -->
+          <div class="supplier-section">
+            <h4>{{ quotation.supplierNameAr }}</h4>
+            <p class="supplier-name-en">{{ quotation.supplierNameEn }}</p>
+          </div>
+
+          <!-- Quotation Details -->
+          <div class="details-section">
+            <div class="detail-row">
+              <span class="label">الكمية المعروضة:</span>
+              <span class="value">{{ quotation.quantityOffered }} قطعة</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">سعر الوحدة:</span>
+              <span class="value price">{{ quotation.unitPrice | number:'1.2-2' }} ريال</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">السعر الإجمالي:</span>
+              <span class="value total-price">{{ quotation.totalPrice | number:'1.2-2' }} ريال</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">مدة التسليم:</span>
+              <span class="value">{{ quotation.deliveryTimeDays }} يوم</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">تاريخ العرض:</span>
+              <span class="value">{{ quotation.quotationDate | date:'yyyy-MM-dd' }}</span>
+            </div>
+            <div *ngIf="quotation.notes" class="detail-row notes">
+              <span class="label">ملاحظات:</span>
+              <span class="value">{{ quotation.notes }}</span>
+            </div>
+          </div>
+
+          <!-- Selection/Rejection Info -->
+          <div *ngIf="quotation.isSelected" class="status-section selected-status">
+            <strong>✓ تم اختيار هذا العرض</strong>
+            <p *ngIf="quotation.selectionReason">{{ quotation.selectionReason }}</p>
+          </div>
+          <div *ngIf="quotation.rejectionReason" class="status-section rejected-status">
+            <strong>✗ تم رفض هذا العرض</strong>
+            <p>{{ quotation.rejectionReason }}</p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons" *ngIf="!quotation.isSelected && !quotation.rejectionReason">
+            <button 
+              *ngIf="quotation.ranking && quotation.ranking <= 3"
+              class="btn btn-success"
+              (click)="selectQuotation(quotation)"
+              title="اختيار العرض">
+              ✓ اختيار
+            </button>
+            <button 
+              class="btn btn-danger"
+              (click)="rejectQuotation(quotation)"
+              title="رفض العرض">
+              ✗ رفض
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="quotations.length === 0" class="no-data">
+      لا توجد عروض أسعار
+    </div>
+  </div>
+
+  <div class="info-section">
+    <h3>📖 معلومات عن عروض الأسعار</h3>
+    <ul>
+      <li><strong>الخطوة 4:</strong> جمع عروض الأسعار من 3 موردين كحد أدنى</li>
+      <li><strong>الترتيب التلقائي:</strong> يتم ترتيب أفضل 3 عروض على أساس السعر</li>
+      <li><strong>الخطوة 5:</strong> الموافقة الثانية - اختيار أفضل عرض</li>
+      <li><strong>المسؤول:</strong> SecondApprover (الموافق الثاني)</li>
+      <li><strong>معايير الاختيار:</strong> السعر، وقت التسليم، تقييم المورد، جودة المنتج</li>
+      <li><strong>بعد الاختيار:</strong> الانتقال إلى الخطوة 6 (إنشاء أمر الشراء)</li>
+    </ul>
+  </div>
+</div>
