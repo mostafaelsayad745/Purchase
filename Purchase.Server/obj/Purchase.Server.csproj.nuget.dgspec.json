@@ -1,32 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Project\\purchase\\New folder (2)\\Purchase-master\\Purchase.Server\\Purchase.Server.csproj": {}
+    "/home/runner/work/purchase/purchase/Purchase.Server/Purchase.Server.csproj": {}
   },
   "projects": {
-    "D:\\Project\\purchase\\New folder (2)\\Purchase-master\\Purchase.Server\\Purchase.Server.csproj": {
+    "/home/runner/work/purchase/purchase/Purchase.Server/Purchase.Server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Project\\purchase\\New folder (2)\\Purchase-master\\Purchase.Server\\Purchase.Server.csproj",
+        "projectUniqueName": "/home/runner/work/purchase/purchase/Purchase.Server/Purchase.Server.csproj",
         "projectName": "Purchase.Server",
-        "projectPath": "D:\\Project\\purchase\\New folder (2)\\Purchase-master\\Purchase.Server\\Purchase.Server.csproj",
-        "packagesPath": "C:\\Users\\Mostafa Elsayad\\.nuget\\packages\\",
-        "outputPath": "D:\\Project\\purchase\\New folder (2)\\Purchase-master\\Purchase.Server\\obj\\",
+        "projectPath": "/home/runner/work/purchase/purchase/Purchase.Server/Purchase.Server.csproj",
+        "packagesPath": "/home/runner/.nuget/packages/",
+        "outputPath": "/home/runner/work/purchase/purchase/Purchase.Server/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Mostafa Elsayad\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/home/runner/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -99,7 +92,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.306/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

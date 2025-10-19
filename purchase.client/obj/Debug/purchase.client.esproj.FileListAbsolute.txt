@@ -1,1 +1,2 @@
-d:\Project\purchase\New folder (2)\Purchase-master\purchase.client\obj\Debug\purchase.client.esproj.CoreCompileInputs.cache
+d:/Project/purchase/New folder (2)/Purchase-master/purchase.client/obj/Debug/purchase.client.esproj.CoreCompileInputs.cache
+/home/runner/work/purchase/purchase/purchase.client/obj/Debug/purchase.client.esproj.CoreCompileInputs.cache

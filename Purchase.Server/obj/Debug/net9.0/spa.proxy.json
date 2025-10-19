@@ -3,7 +3,7 @@
 "ServerUrl": "https://localhost:61710",
 "RedirectUrl": "",
 "LaunchCommand": "npm start",
-"WorkingDirectory": "D:\\Project\\purchase\\New folder (2)\\Purchase-master\\Purchase.Server\\..\\purchase.client",
+"WorkingDirectory": "/home/runner/work/purchase/purchase/Purchase.Server/../purchase.client",
 "MaxTimeoutInSeconds": "120",
 "KeepRunning": "false"
 }
