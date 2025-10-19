@@ -286,9 +286,13 @@ public class QuotationsController : ControllerBase
     {
         var quotations = await _context.Quotations
             .Where(q => q.PurchaseRequestId == purchaseRequestId)
+            .ToListAsync();
+        
+        // Order in memory to avoid SQLite decimal ordering issue
+        quotations = quotations
             .OrderBy(q => q.TotalPrice)
             .ThenBy(q => q.DeliveryTimeDays)
-            .ToListAsync();
+            .ToList();
 
         int rank = 1;
         foreach (var quotation in quotations.Take(3))
