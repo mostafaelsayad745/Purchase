@@ -1,0 +1,111 @@
+<div class="container">
+  <h1>إنشاء طلب أداة جديد</h1>
+
+  <div class="card">
+    <h2>الخطوة 1: الطلب الأولي</h2>
+    <p>قم بملء النموذج التالي لطلب أداة من المخزون</p>
+
+    <div *ngIf="loading" class="loading">
+      <p>جاري التحميل...</p>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+
+    <div *ngIf="successMessage" class="success-message">
+      {{ successMessage }}
+    </div>
+
+    <form *ngIf="!loading" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label class="form-label">الأداة المطلوبة *</label>
+        <select class="form-control" [(ngModel)]="formData.toolId" name="toolId" required>
+          <option value="0">-- اختر الأداة --</option>
+          <option *ngFor="let item of stockItems" [value]="item.id">
+            {{ item.nameAr }} ({{ item.toolId }}) - المتاح: {{ item.currentQuantity }} {{ item.unit }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">الكمية المطلوبة *</label>
+        <input 
+          type="number" 
+          class="form-control" 
+          [(ngModel)]="formData.quantityNeeded" 
+          name="quantityNeeded"
+          min="1"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">منطقة العمل *</label>
+        <select class="form-control" [(ngModel)]="formData.workAreaId" name="workAreaId" required>
+          <option value="0">-- اختر منطقة العمل --</option>
+          <option *ngFor="let area of workAreas" [value]="area.id">
+            {{ area.nameAr }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">سبب الطلب (بالعربية) *</label>
+        <textarea 
+          class="form-control" 
+          [(ngModel)]="formData.reasonAr" 
+          name="reasonAr"
+          rows="4"
+          maxlength="500"
+          required
+          placeholder="مثال: نحتاج إلى هذه الأدوات لإصلاح معدات الإنتاج في الورشة"
+        ></textarea>
+        <small style="color: #666;">{{ formData.reasonAr.length }}/500 حرف</small>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">سبب الطلب (بالإنجليزية)</label>
+        <textarea 
+          class="form-control" 
+          [(ngModel)]="formData.reasonEn" 
+          name="reasonEn"
+          rows="4"
+          maxlength="500"
+          placeholder="Example: We need these tools to repair production equipment in the workshop"
+        ></textarea>
+        <small style="color: #666;">{{ formData.reasonEn.length }}/500 characters</small>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button 
+          type="submit" 
+          class="btn btn-success" 
+          [disabled]="submitting"
+          style="flex: 1;"
+        >
+          {{ submitting ? 'جاري الحفظ...' : 'حفظ الطلب' }}
+        </button>
+        <button 
+          type="button" 
+          class="btn" 
+          (click)="cancel()"
+          [disabled]="submitting"
+          style="flex: 1; background: #6c757d; color: white;"
+        >
+          إلغاء
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card" style="background: #e7f3ff; border-right: 4px solid var(--info-color);">
+    <h3>📋 معلومات مهمة</h3>
+    <ul style="margin: 12px 0; padding-right: 20px;">
+      <li>سيتم التحقق من توفر الأداة في المخزون تلقائياً</li>
+      <li>إذا كانت الأداة متوفرة، سيتم تلبية الطلب مباشرة</li>
+      <li>إذا كانت الأداة غير متوفرة، سيتم إنشاء طلب شراء للموردين</li>
+      <li>يمكنك متابعة حالة طلبك من صفحة "طلبات الأدوات"</li>
+    </ul>
+  </div>
+</div>

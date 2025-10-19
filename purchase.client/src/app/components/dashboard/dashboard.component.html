@@ -1,0 +1,150 @@
+<div class="container">
+  <h1>لوحة التحكم - نظام إدارة المشتريات</h1>
+
+  <div *ngIf="loading" class="loading">
+    <p>جاري التحميل...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error">
+    <!-- Statistics Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 24px;">
+      <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <h3>طلبات الأدوات المعلقة</h3>
+        <h2 style="font-size: 48px; margin: 16px 0;">{{ pendingToolRequests.length }}</h2>
+        <p>طلب جديد في انتظار المعالجة</p>
+      </div>
+
+      <div class="card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+        <h3>طلبات الشراء المعلقة</h3>
+        <h2 style="font-size: 48px; margin: 16px 0;">{{ pendingPurchaseRequests.length }}</h2>
+        <p>طلب شراء في انتظار الموافقة</p>
+      </div>
+
+      <div class="card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+        <h3>أدوات منخفضة المخزون</h3>
+        <h2 style="font-size: 48px; margin: 16px 0;">{{ lowStockItems.length }}</h2>
+        <p>أداة تحتاج إلى إعادة التخزين</p>
+      </div>
+    </div>
+
+    <!-- Workflow Steps -->
+    <div class="card">
+      <h2>خطوات سير عمل الشراء (8 خطوات)</h2>
+      <div style="margin-top: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+          <div class="workflow-step">
+            <div class="step-number">1</div>
+            <h3>الطلب الأولي</h3>
+            <p>طلب الأدوات من مناطق العمل إلى قسم المخزون</p>
+            <a routerLink="/tool-requests/create" class="btn btn-primary">إنشاء طلب جديد</a>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">2</div>
+            <h3>التحقق من المخزون</h3>
+            <p>فحص توفر الأداة في المخزون</p>
+            <a routerLink="/tool-requests" class="btn btn-primary">عرض الطلبات</a>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">3</div>
+            <h3>موافقة طلب الشراء (الموافقة الأولى)</h3>
+            <p>مراجعة وموافقة الإدارة على طلب الشراء</p>
+            <a routerLink="/purchase-requests" class="btn btn-primary">عرض الطلبات</a>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">4</div>
+            <h3>عروض الأسعار واختيار المورد</h3>
+            <p>جمع عروض الأسعار من 3 موردين على الأقل</p>
+            <a routerLink="/quotations" class="btn btn-primary">إدارة العروض</a>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">5</div>
+            <h3>موافقة أفضل عرض (الموافقة الثانية)</h3>
+            <p>مراجعة واختيار أفضل عرض من أفضل 3 عروض</p>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">6</div>
+            <h3>أمر الشراء وإدارة المستندات</h3>
+            <p>إنشاء أمر الشراء وتحميل المستندات المطلوبة</p>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">7</div>
+            <h3>استلام البضائع وإدارة المخزون</h3>
+            <p>استلام البضائع وفحص الجودة وتحديث المخزون</p>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">8</div>
+            <h3>معالجة الدفع</h3>
+            <p>مراجعة المستندات ومعالجة الدفع</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Tool Requests -->
+    <div class="card" *ngIf="pendingToolRequests.length > 0">
+      <h2>طلبات الأدوات الأخيرة</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>الأداة</th>
+            <th>الكمية</th>
+            <th>منطقة العمل</th>
+            <th>تاريخ الطلب</th>
+            <th>الحالة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let request of pendingToolRequests">
+            <td>{{ request.id }}</td>
+            <td>{{ request.toolNameAr }}</td>
+            <td>{{ request.quantityNeeded }}</td>
+            <td>{{ request.workAreaNameAr }}</td>
+            <td>{{ request.requestDate | date:'short' }}</td>
+            <td>
+              <span [class]="'status-badge ' + getStatusColor(request.status)">
+                {{ getStatusText(request.status) }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Low Stock Alert -->
+    <div class="card" *ngIf="lowStockItems.length > 0" style="border-right: 4px solid var(--warning-color);">
+      <h2>⚠️ تنبيه: أدوات منخفضة المخزون</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>رمز الأداة</th>
+            <th>اسم الأداة</th>
+            <th>الكمية الحالية</th>
+            <th>الحد الأدنى</th>
+            <th>الوحدة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of lowStockItems">
+            <td>{{ item.toolId }}</td>
+            <td>{{ item.nameAr }}</td>
+            <td style="color: red; font-weight: bold;">{{ item.currentQuantity }}</td>
+            <td>{{ item.minimumThreshold }}</td>
+            <td>{{ item.unit }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

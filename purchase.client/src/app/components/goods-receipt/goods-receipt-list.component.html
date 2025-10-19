@@ -1,0 +1,60 @@
+<div class="container">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h1>إيصالات استلام البضائع</h1>
+    <button class="btn btn-primary" (click)="createNew()">
+      + إنشاء إيصال استلام جديد
+    </button>
+  </div>
+
+  <div class="card">
+    <div *ngIf="loading" class="loading">
+      <p>جاري التحميل...</p>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!loading && !error && goodsReceipts.length === 0" style="text-align: center; padding: 40px; color: #666;">
+      <p>لا توجد إيصالات استلام متاحة</p>
+    </div>
+
+    <table class="table" *ngIf="!loading && !error && goodsReceipts.length > 0">
+      <thead>
+        <tr>
+          <th>رقم الأمر</th>
+          <th>تاريخ الاستلام</th>
+          <th>الأداة</th>
+          <th>الكمية المستلمة</th>
+          <th>الكمية المتوقعة</th>
+          <th>حالة الجودة</th>
+          <th>تحديث المخزون</th>
+          <th>الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let receipt of goodsReceipts">
+          <td><strong>{{ receipt.orderNumber }}</strong></td>
+          <td>{{ receipt.receivedDate | date:'short' }}</td>
+          <td>{{ receipt.toolNameAr }}</td>
+          <td>{{ receipt.receivedQuantity }}</td>
+          <td>{{ receipt.expectedQuantity }}</td>
+          <td>
+            <span [class]="'status-badge ' + getQualityColor(receipt.qualityStatus)">
+              {{ getQualityText(receipt.qualityStatus) }}
+            </span>
+          </td>
+          <td>
+            <span *ngIf="receipt.stockUpdated" style="color: green;">✓ تم التحديث</span>
+            <span *ngIf="!receipt.stockUpdated" style="color: orange;">⚠ لم يتم التحديث</span>
+          </td>
+          <td>
+            <button class="btn btn-primary" style="font-size: 12px; padding: 4px 8px;" (click)="viewDetails(receipt.id)">
+              عرض التفاصيل
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

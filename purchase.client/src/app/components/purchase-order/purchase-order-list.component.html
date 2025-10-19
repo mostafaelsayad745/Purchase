@@ -1,0 +1,68 @@
+<div class="container">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h1>أوامر الشراء</h1>
+    <button class="btn btn-primary" (click)="createNew()">
+      + إنشاء أمر شراء جديد
+    </button>
+  </div>
+
+  <div class="card">
+    <div style="margin-bottom: 20px;">
+      <label class="form-label">تصفية حسب الحالة:</label>
+      <select class="form-control" [(ngModel)]="selectedStatus" (change)="filterByStatus()" style="max-width: 300px;">
+        <option value="">جميع الحالات</option>
+        <option value="Created">تم الإنشاء</option>
+        <option value="Received">تم الاستلام</option>
+        <option value="Inspected">تم الفحص</option>
+        <option value="Paid">تم الدفع</option>
+      </select>
+    </div>
+
+    <div *ngIf="loading" class="loading">
+      <p>جاري التحميل...</p>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!loading && !error && purchaseOrders.length === 0" style="text-align: center; padding: 40px; color: #666;">
+      <p>لا توجد أوامر شراء متاحة</p>
+    </div>
+
+    <table class="table" *ngIf="!loading && !error && purchaseOrders.length > 0">
+      <thead>
+        <tr>
+          <th>رقم الأمر</th>
+          <th>تاريخ الأمر</th>
+          <th>تاريخ التسليم المتوقع</th>
+          <th>الأداة</th>
+          <th>المورد</th>
+          <th>المبلغ الإجمالي</th>
+          <th>الحالة</th>
+          <th>الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of purchaseOrders">
+          <td><strong>{{ order.orderNumber }}</strong></td>
+          <td>{{ order.orderDate | date:'short' }}</td>
+          <td>{{ order.expectedDeliveryDate | date:'short' }}</td>
+          <td>{{ order.toolNameAr }}</td>
+          <td>{{ order.supplierNameAr }}</td>
+          <td><strong>{{ order.totalAmount | number:'1.2-2' }} ريال</strong></td>
+          <td>
+            <span [class]="'status-badge ' + getStatusColor(order.status)">
+              {{ getStatusText(order.status) }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-primary" style="font-size: 12px; padding: 4px 8px;" (click)="viewDetails(order.id)">
+              عرض التفاصيل
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

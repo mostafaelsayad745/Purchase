@@ -1,0 +1,72 @@
+<div class="container">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h1>طلبات الأدوات</h1>
+    <button class="btn btn-primary" (click)="createNew()">
+      + إنشاء طلب جديد
+    </button>
+  </div>
+
+  <div class="card">
+    <div style="margin-bottom: 20px;">
+      <label class="form-label">تصفية حسب الحالة:</label>
+      <select class="form-control" [(ngModel)]="selectedStatus" (change)="filterByStatus()" style="max-width: 300px;">
+        <option value="">جميع الحالات</option>
+        <option value="Pending">قيد الانتظار</option>
+        <option value="InStock">متوفر في المخزون</option>
+        <option value="OutOfStock">غير متوفر</option>
+        <option value="Rejected">مرفوض</option>
+      </select>
+    </div>
+
+    <div *ngIf="loading" class="loading">
+      <p>جاري التحميل...</p>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!loading && !error && toolRequests.length === 0" style="text-align: center; padding: 40px; color: #666;">
+      <p>لا توجد طلبات متاحة</p>
+    </div>
+
+    <table class="table" *ngIf="!loading && !error && toolRequests.length > 0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>رمز الأداة</th>
+          <th>اسم الأداة</th>
+          <th>الكمية المطلوبة</th>
+          <th>منطقة العمل</th>
+          <th>مقدم الطلب</th>
+          <th>تاريخ الطلب</th>
+          <th>السبب</th>
+          <th>الحالة</th>
+          <th>الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let request of toolRequests">
+          <td>{{ request.id }}</td>
+          <td>TOOL-{{ ('000' + request.toolId).slice(-3) }}</td>
+          <td>{{ request.toolNameAr }}</td>
+          <td>{{ request.quantityNeeded }}</td>
+          <td>{{ request.workAreaNameAr }}</td>
+          <td>{{ request.requesterNameAr }}</td>
+          <td>{{ request.requestDate | date:'short' }}</td>
+          <td>{{ request.reasonAr }}</td>
+          <td>
+            <span [class]="'status-badge ' + getStatusColor(request.status)">
+              {{ getStatusText(request.status) }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-primary" style="font-size: 12px; padding: 4px 8px;">
+              عرض التفاصيل
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

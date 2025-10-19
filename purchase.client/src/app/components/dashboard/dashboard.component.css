@@ -1,0 +1,45 @@
+.workflow-step {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.workflow-step:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.step-number {
+  width: 50px;
+  height: 50px;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 auto 16px;
+}
+
+.workflow-step h3 {
+  color: #333;
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.workflow-step p {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 16px;
+  min-height: 60px;
+}
+
+.workflow-step .btn {
+  width: 100%;
+}

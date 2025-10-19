@@ -1,0 +1,28 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand">
+      <h2>🛒 نظام إدارة المشتريات</h2>
+      <p style="margin: 0; font-size: 14px; color: #ddd;">Purchase Management System</p>
+    </div>
+    <button class="menu-toggle" (click)="toggleMenu()">☰</button>
+    <ul class="navbar-menu" [class.active]="menuOpen">
+      <li><a routerLink="/dashboard" routerLinkActive="active">لوحة التحكم</a></li>
+      <li><a routerLink="/tool-requests" routerLinkActive="active">طلبات الأدوات</a></li>
+      <li><a routerLink="/purchase-requests" routerLinkActive="active">طلبات الشراء</a></li>
+      <li><a routerLink="/quotations" routerLinkActive="active">عروض الأسعار</a></li>
+      <li><a routerLink="/purchase-orders" routerLinkActive="active">أوامر الشراء</a></li>
+      <li><a routerLink="/goods-receipts" routerLinkActive="active">استلام البضائع</a></li>
+      <li><a routerLink="/payments" routerLinkActive="active">المدفوعات</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <p>© 2025 نظام إدارة المشتريات - جميع الحقوق محفوظة</p>
+  </div>
+</footer>

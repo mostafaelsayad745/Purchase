@@ -1,0 +1,67 @@
+<div class="container">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h1>المدفوعات</h1>
+    <button class="btn btn-primary" (click)="createNew()">
+      + إنشاء دفعة جديدة
+    </button>
+  </div>
+
+  <div class="card">
+    <div style="margin-bottom: 20px;">
+      <label class="form-label">تصفية حسب الحالة:</label>
+      <select class="form-control" [(ngModel)]="selectedStatus" (change)="filterByStatus()" style="max-width: 300px;">
+        <option value="">جميع الحالات</option>
+        <option value="Pending">قيد الانتظار</option>
+        <option value="Completed">مكتمل</option>
+        <option value="Failed">فشل</option>
+      </select>
+    </div>
+
+    <div *ngIf="loading" class="loading">
+      <p>جاري التحميل...</p>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!loading && !error && payments.length === 0" style="text-align: center; padding: 40px; color: #666;">
+      <p>لا توجد مدفوعات متاحة</p>
+    </div>
+
+    <table class="table" *ngIf="!loading && !error && payments.length > 0">
+      <thead>
+        <tr>
+          <th>رقم الأمر</th>
+          <th>المرجع</th>
+          <th>المورد</th>
+          <th>المبلغ</th>
+          <th>تاريخ الدفع</th>
+          <th>طريقة الدفع</th>
+          <th>الحالة</th>
+          <th>الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let payment of payments">
+          <td><strong>{{ payment.orderNumber }}</strong></td>
+          <td>{{ payment.transactionReference }}</td>
+          <td>{{ payment.supplierNameAr }}</td>
+          <td><strong>{{ payment.amount | number:'1.2-2' }} ريال</strong></td>
+          <td>{{ payment.paymentDate | date:'short' }}</td>
+          <td>{{ getPaymentMethodText(payment.paymentMethod) }}</td>
+          <td>
+            <span [class]="'status-badge ' + getStatusColor(payment.status)">
+              {{ getStatusText(payment.status) }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-primary" style="font-size: 12px; padding: 4px 8px;" (click)="viewDetails(payment.id)">
+              عرض التفاصيل
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
