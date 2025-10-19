@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface StockItem {
   id: number;
@@ -44,30 +45,30 @@ export class MasterDataService {
   constructor(private http: HttpClient) { }
 
   getStockItems(): Observable<StockItem[]> {
-    return this.http.get<StockItem[]>('/api/stockitems');
+    return this.http.get<StockItem[]>(`${environment.apiUrl}/stockitems`);
   }
 
   getStockItem(id: number): Observable<StockItem> {
-    return this.http.get<StockItem>(`/api/stockitems/${id}`);
+    return this.http.get<StockItem>(`${environment.apiUrl}/stockitems/${id}`);
   }
 
   getLowStockItems(): Observable<StockItem[]> {
-    return this.http.get<StockItem[]>('/api/stockitems/low-stock');
+    return this.http.get<StockItem[]>(`${environment.apiUrl}/stockitems/low-stock`);
   }
 
   getWorkAreas(): Observable<WorkArea[]> {
-    return this.http.get<WorkArea[]>('/api/workareas');
+    return this.http.get<WorkArea[]>(`${environment.apiUrl}/workareas`);
   }
 
   getWorkArea(id: number): Observable<WorkArea> {
-    return this.http.get<WorkArea>(`/api/workareas/${id}`);
+    return this.http.get<WorkArea>(`${environment.apiUrl}/workareas/${id}`);
   }
 
   getSuppliers(): Observable<Supplier[]> {
-    return this.http.get<Supplier[]>('/api/suppliers');
+    return this.http.get<Supplier[]>(`${environment.apiUrl}/suppliers`);
   }
 
   getSupplier(id: number): Observable<Supplier> {
-    return this.http.get<Supplier>(`/api/suppliers/${id}`);
+    return this.http.get<Supplier>(`${environment.apiUrl}/suppliers/${id}`);
   }
 }

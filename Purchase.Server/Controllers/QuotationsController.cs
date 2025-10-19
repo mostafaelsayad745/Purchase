@@ -83,6 +83,10 @@ public class QuotationsController : ControllerBase
             var quotations = await _context.Quotations
                 .Include(q => q.Supplier)
                 .Where(q => q.PurchaseRequestId == purchaseRequestId)
+                .ToListAsync();
+            
+            // Order in memory and take top 3 to avoid SQLite decimal ordering issue
+            var top3 = quotations
                 .OrderBy(q => q.TotalPrice) // Price-based ranking
                 .ThenBy(q => q.DeliveryTimeDays)
                 .Take(3)
@@ -105,9 +109,9 @@ public class QuotationsController : ControllerBase
                     SelectionReason = q.SelectionReason,
                     RejectionReason = q.RejectionReason
                 })
-                .ToListAsync();
+                .ToList();
 
-            return Ok(quotations);
+            return Ok(top3);
         }
         catch (Exception ex)
         {
@@ -286,9 +290,13 @@ public class QuotationsController : ControllerBase
     {
         var quotations = await _context.Quotations
             .Where(q => q.PurchaseRequestId == purchaseRequestId)
+            .ToListAsync();
+        
+        // Order in memory to avoid SQLite decimal ordering issue
+        quotations = quotations
             .OrderBy(q => q.TotalPrice)
             .ThenBy(q => q.DeliveryTimeDays)
-            .ToListAsync();
+            .ToList();
 
         int rank = 1;
         foreach (var quotation in quotations.Take(3))
