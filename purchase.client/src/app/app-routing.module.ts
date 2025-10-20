@@ -4,6 +4,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ToolRequestListComponent } from './components/tool-request/tool-request-list.component';
 import { CreateToolRequestComponent } from './components/tool-request/create-tool-request.component';
 import { PurchaseRequestListComponent } from './components/purchase-request/purchase-request-list.component';
+import { PurchaseRequestDetailComponent } from './components/purchase-request/purchase-request-detail.component';
 import { QuotationListComponent } from './components/quotation/quotation-list.component';
 import { PurchaseOrderListComponent } from './components/purchase-order/purchase-order-list.component';
 import { CreatePurchaseOrderComponent } from './components/purchase-order/create-purchase-order.component';
@@ -21,6 +22,7 @@ const routes: Routes = [
   { path: 'tool-requests', component: ToolRequestListComponent },
   { path: 'tool-requests/create', component: CreateToolRequestComponent },
   { path: 'purchase-requests', component: PurchaseRequestListComponent },
+  { path: 'purchase-requests/:id', component: PurchaseRequestDetailComponent },
   { path: 'quotations', component: QuotationListComponent },
   { path: 'purchase-orders', component: PurchaseOrderListComponent },
   { path: 'purchase-orders/create', component: CreatePurchaseOrderComponent },

@@ -1,0 +1,89 @@
+<div class="container">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h1>تفاصيل طلب الشراء</h1>
+    <button class="btn" (click)="goBack()" style="background: #6c757d; color: white;">
+      ← العودة للقائمة
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>جاري التحميل...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error && purchaseRequest">
+    <div class="card">
+      <h2>معلومات الطلب</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+        <div>
+          <strong>رقم الطلب:</strong>
+          <p>{{ purchaseRequest.id }}</p>
+        </div>
+        <div>
+          <strong>الحالة:</strong>
+          <p>
+            <span [class]="'status-badge ' + getStatusClass(purchaseRequest.status)">
+              {{ getStatusText(purchaseRequest.status) }}
+            </span>
+          </p>
+        </div>
+        <div>
+          <strong>اسم الأداة:</strong>
+          <p>{{ purchaseRequest.toolNameAr }}</p>
+        </div>
+        <div>
+          <strong>الكمية المطلوبة:</strong>
+          <p>{{ purchaseRequest.quantityNeeded }}</p>
+        </div>
+        <div>
+          <strong>تاريخ الطلب:</strong>
+          <p>{{ purchaseRequest.requestDate | date:'yyyy-MM-dd HH:mm' }}</p>
+        </div>
+        <div>
+          <strong>الميزانية المقدرة:</strong>
+          <p>{{ purchaseRequest.estimatedBudget || '-' }} ريال</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" *ngIf="purchaseRequest.status === 'Approved' || purchaseRequest.status === 'Rejected'">
+      <h2>معلومات الموافقة</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+        <div>
+          <strong>الموافق:</strong>
+          <p>{{ purchaseRequest.approvedByNameAr || '-' }}</p>
+        </div>
+        <div>
+          <strong>تاريخ الموافقة:</strong>
+          <p>{{ purchaseRequest.approvalDate ? (purchaseRequest.approvalDate | date:'yyyy-MM-dd HH:mm') : '-' }}</p>
+        </div>
+        <div *ngIf="purchaseRequest.status === 'Rejected'">
+          <strong>سبب الرفض:</strong>
+          <p>{{ purchaseRequest.rejectionReason || '-' }}</p>
+        </div>
+        <div *ngIf="purchaseRequest.status === 'Approved'">
+          <strong>ملاحظات الموافقة:</strong>
+          <p>{{ purchaseRequest.notes || '-' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>التواريخ</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+        <div>
+          <strong>تاريخ الإنشاء:</strong>
+          <p>{{ purchaseRequest.createdAt | date:'yyyy-MM-dd HH:mm' }}</p>
+        </div>
+        <div>
+          <strong>آخر تحديث:</strong>
+          <p>{{ purchaseRequest.updatedAt | date:'yyyy-MM-dd HH:mm' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

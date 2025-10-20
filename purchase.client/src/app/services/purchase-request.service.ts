@@ -16,6 +16,9 @@ export interface PurchaseRequest {
   approvalNotes?: string;
   rejectionReason?: string;
   estimatedBudget?: number;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CreatePurchaseRequestDto {

@@ -76,12 +76,31 @@
       <div class="form-group">
         <label class="form-label">مستند إثبات الاستلام</label>
         <input 
-          type="text" 
+          type="file" 
           class="form-control" 
-          [(ngModel)]="formData.proofOfReceiptDocument" 
-          name="proofOfReceiptDocument"
-          placeholder="رابط أو اسم مستند إثبات الاستلام"
+          (change)="onFileSelected($event)"
+          name="proofOfReceiptFile"
+          accept="image/*,.pdf,.doc,.docx"
         />
+        <small style="display: block; margin-top: 8px; color: #666;">
+          يمكنك رفع صور أو ملفات PDF, DOC
+        </small>
+        
+        <div *ngIf="uploadedFiles.length > 0" style="margin-top: 12px;">
+          <strong>الملفات المرفقة:</strong>
+          <ul style="list-style: none; padding: 0; margin-top: 8px;">
+            <li *ngFor="let file of uploadedFiles" style="padding: 8px; background: #f0f0f0; margin: 4px 0; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+              <span>📎 {{ file }}</span>
+              <button 
+                type="button" 
+                class="btn btn-danger" 
+                (click)="removeFile(file)"
+                style="padding: 2px 8px; font-size: 12px;">
+                حذف
+              </button>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div style="display: flex; gap: 12px; margin-top: 24px;">
@@ -91,7 +110,16 @@
           [disabled]="submitting"
           style="flex: 1;"
         >
-          {{ submitting ? 'جاري الحفظ...' : 'حفظ الإيصال' }}
+          {{ submitting ? 'جاري الحفظ...' : '💾 حفظ الإيصال' }}
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          (click)="printReceipt()"
+          [disabled]="submitting"
+          style="flex: 1;"
+        >
+          🖨️ طباعة الإيصال
         </button>
         <button 
           type="button" 

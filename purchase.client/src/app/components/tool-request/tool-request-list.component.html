@@ -73,9 +73,19 @@
             </span>
           </td>
           <td>
-            <button class="btn btn-primary" style="font-size: 12px; padding: 4px 8px;">
-              عرض التفاصيل
-            </button>
+            <div style="display: flex; gap: 4px;">
+              <button class="btn btn-primary" style="font-size: 12px; padding: 4px 8px;">
+                عرض التفاصيل
+              </button>
+              <button 
+                *ngIf="request.status === 'OutOfStock'"
+                class="btn btn-success" 
+                style="font-size: 12px; padding: 4px 8px;"
+                (click)="sendToPurchaseRequest(request)"
+                title="إرسال لطلبات الشراء">
+                📝 إرسال للشراء
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>

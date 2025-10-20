@@ -11,6 +11,17 @@ export class PurchaseOrderDetailComponent implements OnInit {
   purchaseOrder: PurchaseOrder | null = null;
   loading = false;
   error: string | null = null;
+  editMode = false;
+  saving = false;
+
+  // Edit form data
+  editData = {
+    notes: '',
+    purchaseOrderDocument: '',
+    invoiceDocument: '',
+    deliveryNoteDocument: '',
+    supplierAgreementDocument: ''
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -64,5 +75,41 @@ export class PurchaseOrderDetailComponent implements OnInit {
       case 'Paid': return 'status-fulfilled';
       default: return '';
     }
+  }
+
+  enableEditMode(): void {
+    this.editMode = true;
+    if (this.purchaseOrder) {
+      this.editData = {
+        notes: this.purchaseOrder.notes || '',
+        purchaseOrderDocument: this.purchaseOrder.purchaseOrderDocument || '',
+        invoiceDocument: this.purchaseOrder.invoiceDocument || '',
+        deliveryNoteDocument: this.purchaseOrder.deliveryNoteDocument || '',
+        supplierAgreementDocument: this.purchaseOrder.supplierAgreementDocument || ''
+      };
+    }
+  }
+
+  cancelEdit(): void {
+    this.editMode = false;
+  }
+
+  saveChanges(): void {
+    if (!this.purchaseOrder) return;
+
+    this.saving = true;
+    this.purchaseOrderService.updateDocuments(this.purchaseOrder.id, this.editData).subscribe({
+      next: () => {
+        alert('تم حفظ التغييرات بنجاح');
+        this.editMode = false;
+        this.saving = false;
+        this.loadPurchaseOrder(this.purchaseOrder!.id);
+      },
+      error: (err) => {
+        console.error('Error saving changes:', err);
+        alert('حدث خطأ في حفظ التغييرات');
+        this.saving = false;
+      }
+    });
   }
 }

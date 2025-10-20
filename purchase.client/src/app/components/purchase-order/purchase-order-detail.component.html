@@ -1,9 +1,18 @@
 <div class="container">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
     <h1>تفاصيل أمر الشراء</h1>
-    <button class="btn" (click)="goBack()" style="background: #6c757d; color: white;">
-      ← العودة للقائمة
-    </button>
+    <div style="display: flex; gap: 12px;">
+      <button 
+        *ngIf="!editMode" 
+        class="btn btn-primary" 
+        (click)="enableEditMode()"
+        title="تعديل">
+        ✏️ تعديل
+      </button>
+      <button class="btn" (click)="goBack()" style="background: #6c757d; color: white;">
+        ← العودة للقائمة
+      </button>
+    </div>
   </div>
 
   <div *ngIf="loading" class="loading">
@@ -73,14 +82,24 @@
       </div>
     </div>
 
-    <div class="card" *ngIf="purchaseOrder.notes">
+    <div class="card">
       <h2>الملاحظات</h2>
-      <p>{{ purchaseOrder.notes }}</p>
+      <div *ngIf="!editMode">
+        <p>{{ purchaseOrder.notes || 'لا توجد ملاحظات' }}</p>
+      </div>
+      <div *ngIf="editMode">
+        <textarea 
+          class="form-control" 
+          [(ngModel)]="editData.notes"
+          rows="3"
+          placeholder="أدخل الملاحظات..."
+        ></textarea>
+      </div>
     </div>
 
     <div class="card">
       <h2>المستندات</h2>
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+      <div *ngIf="!editMode" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
         <div>
           <strong>مستند أمر الشراء:</strong>
           <p>{{ purchaseOrder.purchaseOrderDocument || 'لم يتم الرفع' }}</p>
@@ -96,6 +115,61 @@
         <div>
           <strong>مستند اتفاقية المورد:</strong>
           <p>{{ purchaseOrder.supplierAgreementDocument || 'لم يتم الرفع' }}</p>
+        </div>
+      </div>
+      <div *ngIf="editMode" style="display: grid; grid-template-columns: 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">مستند أمر الشراء:</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            [(ngModel)]="editData.purchaseOrderDocument"
+            placeholder="رابط أو اسم مستند أمر الشراء"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">مستند الفاتورة:</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            [(ngModel)]="editData.invoiceDocument"
+            placeholder="رابط أو اسم مستند الفاتورة"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">مستند إيصال التسليم:</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            [(ngModel)]="editData.deliveryNoteDocument"
+            placeholder="رابط أو اسم مستند إيصال التسليم"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">مستند اتفاقية المورد:</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            [(ngModel)]="editData.supplierAgreementDocument"
+            placeholder="رابط أو اسم مستند اتفاقية المورد"
+          />
+        </div>
+        <div style="display: flex; gap: 12px; margin-top: 16px;">
+          <button 
+            class="btn btn-success" 
+            (click)="saveChanges()"
+            [disabled]="saving"
+          >
+            {{ saving ? 'جاري الحفظ...' : '💾 حفظ التغييرات' }}
+          </button>
+          <button 
+            class="btn" 
+            (click)="cancelEdit()"
+            [disabled]="saving"
+            style="background: #6c757d; color: white;"
+          >
+            إلغاء
+          </button>
         </div>
       </div>
     </div>
