@@ -4,15 +4,21 @@ namespace Purchase.Server.DTOs;
 
 public class CreateToolRequestDto
 {
-    [Required(ErrorMessage = "معرف الأداة مطلوب")]
-    public int ToolId { get; set; }
+    public int? ToolId { get; set; }
+    
+    public string? ToolName { get; set; }
 
     [Required(ErrorMessage = "الكمية المطلوبة مطلوبة")]
     [Range(1, int.MaxValue, ErrorMessage = "يجب أن تكون الكمية أكبر من صفر")]
     public int QuantityNeeded { get; set; }
 
-    [Required(ErrorMessage = "معرف منطقة العمل مطلوب")]
-    public int WorkAreaId { get; set; }
+    public int? WorkAreaId { get; set; }
+    
+    public string? WorkAreaName { get; set; }
+    
+    public string? RequesterName { get; set; }
+    
+    public string? Status { get; set; }
 
     [Required(ErrorMessage = "السبب مطلوب")]
     [StringLength(500, ErrorMessage = "يجب ألا يتجاوز السبب 500 حرف")]

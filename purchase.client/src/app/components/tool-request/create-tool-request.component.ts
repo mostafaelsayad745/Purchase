@@ -20,6 +20,8 @@ export class CreateToolRequestComponent implements OnInit {
     toolName: '',
     workAreaName: '',
     quantityNeeded: 1,
+    requesterName: '',
+    status: 'Pending',
     reasonAr: '',
     reasonEn: ''
   };
@@ -69,27 +71,13 @@ export class CreateToolRequestComponent implements OnInit {
     this.error = null;
     this.successMessage = null;
 
-    // Try to find matching tool and work area
-    const matchingTool = this.stockItems.find(item => item.nameAr === this.formData.toolName);
-    const matchingWorkArea = this.workAreas.find(area => area.nameAr === this.formData.workAreaName);
-
-    if (!matchingTool) {
-      this.error = 'لم يتم العثور على الأداة المحددة. الرجاء اختيار أداة من القائمة.';
-      this.submitting = false;
-      return;
-    }
-
-    if (!matchingWorkArea) {
-      this.error = 'لم يتم العثور على منطقة العمل المحددة. الرجاء اختيار منطقة عمل من القائمة.';
-      this.submitting = false;
-      return;
-    }
-
-    // Create the request DTO with IDs
+    // Create the request DTO with names (no need to find IDs)
     const requestDto = {
-      toolId: matchingTool.id,
+      toolName: this.formData.toolName,
       quantityNeeded: this.formData.quantityNeeded,
-      workAreaId: matchingWorkArea.id,
+      workAreaName: this.formData.workAreaName,
+      requesterName: this.formData.requesterName || undefined,
+      status: this.formData.status || 'Pending',
       reasonAr: this.formData.reasonAr,
       reasonEn: this.formData.reasonEn
     };

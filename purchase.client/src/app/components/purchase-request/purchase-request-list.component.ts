@@ -17,8 +17,13 @@ export class PurchaseRequestListComponent implements OnInit {
   selectedStatus = '';
   showCreateForm = false;
   
-  newPurchaseRequest: CreatePurchaseRequestDto = {
-    toolRequestId: 0,
+  newPurchaseRequest: any = {
+    toolRequestName: '',
+    quantity: 1,
+    requestDate: null,
+    status: 'PendingApproval',
+    approverName: '',
+    approvalDate: null,
     estimatedBudget: 0
   };
 
@@ -128,8 +133,8 @@ export class PurchaseRequestListComponent implements OnInit {
   }
 
   createPurchaseRequest() {
-    if (this.newPurchaseRequest.toolRequestId === 0) {
-      alert('الرجاء اختيار طلب الأداة');
+    if (!this.newPurchaseRequest.toolRequestName || !this.newPurchaseRequest.toolRequestName.trim()) {
+      alert('الرجاء إدخال اسم الأداة المطلوبة');
       return;
     }
 
@@ -144,7 +149,7 @@ export class PurchaseRequestListComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error creating purchase request:', err);
-        alert('حدث خطأ في إنشاء طلب الشراء');
+        alert(err.error?.message || 'حدث خطأ في إنشاء طلب الشراء');
         this.creating = false;
       }
     });
@@ -152,7 +157,12 @@ export class PurchaseRequestListComponent implements OnInit {
 
   resetForm() {
     this.newPurchaseRequest = {
-      toolRequestId: 0,
+      toolRequestName: '',
+      quantity: 1,
+      requestDate: null,
+      status: 'PendingApproval',
+      approverName: '',
+      approvalDate: null,
       estimatedBudget: 0
     };
   }

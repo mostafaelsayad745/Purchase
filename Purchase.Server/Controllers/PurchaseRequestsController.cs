@@ -25,33 +25,113 @@ public class PurchaseRequestsController : ControllerBase
     {
         try
         {
-            // Validate tool request exists and is out of stock
-            var toolRequest = await _context.ToolRequests.FindAsync(dto.ToolRequestId);
-            if (toolRequest == null)
+            int toolRequestId;
+            
+            // Handle tool request - accept either ToolRequestId or ToolRequestName
+            if (dto.ToolRequestId.HasValue)
             {
-                return BadRequest(new { message = "طلب الأداة غير موجود", messageEn = "Tool request not found" });
+                var toolRequest = await _context.ToolRequests.FindAsync(dto.ToolRequestId.Value);
+                if (toolRequest == null)
+                {
+                    return BadRequest(new { message = "طلب الأداة غير موجود", messageEn = "Tool request not found" });
+                }
+                toolRequestId = dto.ToolRequestId.Value;
             }
-
-            if (toolRequest.Status != "OutOfStock")
+            else if (!string.IsNullOrEmpty(dto.ToolRequestName))
             {
-                return BadRequest(new { message = "لا يمكن إنشاء طلب شراء لأداة متوفرة في المخزون", messageEn = "Cannot create purchase request for in-stock item" });
+                // Try to find a tool request by tool name
+                var toolRequest = await _context.ToolRequests
+                    .Include(tr => tr.Tool)
+                    .FirstOrDefaultAsync(tr => tr.Tool.NameAr == dto.ToolRequestName);
+                
+                if (toolRequest == null)
+                {
+                    // Create a new tool request
+                    var tool = await _context.StockItems.FirstOrDefaultAsync(t => t.NameAr == dto.ToolRequestName);
+                    if (tool == null)
+                    {
+                        // Create a new stock item
+                        var newTool = new StockItem
+                        {
+                            NameAr = dto.ToolRequestName,
+                            NameEn = dto.ToolRequestName,
+                            CurrentQuantity = 0,
+                            MinimumQuantity = 1,
+                            Unit = "قطعة"
+                        };
+                        _context.StockItems.Add(newTool);
+                        await _context.SaveChangesAsync();
+                        tool = newTool;
+                    }
+                    
+                    // Create a new tool request
+                    var newToolRequest = new ToolRequest
+                    {
+                        ToolId = tool.Id,
+                        QuantityNeeded = dto.Quantity ?? 1,
+                        WorkAreaId = 1, // Default work area
+                        RequesterId = 1, // Default requester
+                        RequestDate = dto.RequestDate ?? DateTime.UtcNow,
+                        ReasonAr = "طلب شراء",
+                        Status = "OutOfStock",
+                        IsInStock = false
+                    };
+                    _context.ToolRequests.Add(newToolRequest);
+                    await _context.SaveChangesAsync();
+                    toolRequestId = newToolRequest.Id;
+                }
+                else
+                {
+                    toolRequestId = toolRequest.Id;
+                }
+            }
+            else
+            {
+                return BadRequest(new { message = "يجب تحديد طلب الأداة إما بالمعرف أو الاسم", messageEn = "Tool request must be specified by ID or name" });
             }
 
             // Check if purchase request already exists
             var existingRequest = await _context.PurchaseRequests
-                .FirstOrDefaultAsync(pr => pr.ToolRequestId == dto.ToolRequestId);
+                .FirstOrDefaultAsync(pr => pr.ToolRequestId == toolRequestId);
             
             if (existingRequest != null)
             {
                 return BadRequest(new { message = "طلب شراء موجود بالفعل لهذا الطلب", messageEn = "Purchase request already exists for this tool request" });
             }
 
+            // Handle approver
+            int? approverId = null;
+            if (!string.IsNullOrEmpty(dto.ApproverName))
+            {
+                var approver = await _context.Users.FirstOrDefaultAsync(u => u.FullNameAr == dto.ApproverName);
+                if (approver == null)
+                {
+                    // Create a new user
+                    var newApprover = new User
+                    {
+                        Username = dto.ApproverName.Replace(" ", "").ToLower(),
+                        FullNameAr = dto.ApproverName,
+                        FullNameEn = dto.ApproverName,
+                        Role = "FirstApprover"
+                    };
+                    _context.Users.Add(newApprover);
+                    await _context.SaveChangesAsync();
+                    approverId = newApprover.Id;
+                }
+                else
+                {
+                    approverId = approver.Id;
+                }
+            }
+
             var purchaseRequest = new PurchaseRequest
             {
-                ToolRequestId = dto.ToolRequestId,
-                RequestDate = DateTime.UtcNow,
-                Status = "PendingApproval",
-                EstimatedBudget = dto.EstimatedBudget
+                ToolRequestId = toolRequestId,
+                RequestDate = dto.RequestDate ?? DateTime.UtcNow,
+                Status = !string.IsNullOrEmpty(dto.Status) ? dto.Status : "PendingApproval",
+                EstimatedBudget = dto.EstimatedBudget,
+                ApprovedById = approverId,
+                ApprovalDate = dto.ApprovalDate
             };
 
             _context.PurchaseRequests.Add(purchaseRequest);

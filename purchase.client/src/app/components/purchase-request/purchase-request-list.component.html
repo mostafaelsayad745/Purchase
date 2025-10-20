@@ -15,12 +15,65 @@
     <form (ngSubmit)="createPurchaseRequest()">
       <div class="form-group">
         <label class="form-label">طلب الأداة *</label>
-        <select class="form-control" [(ngModel)]="newPurchaseRequest.toolRequestId" name="toolRequestId" required>
-          <option [value]="0">-- اختر طلب الأداة --</option>
-          <option *ngFor="let tr of outOfStockToolRequests" [value]="tr.id">
-            {{ tr.toolNameAr }} - الكمية: {{ tr.quantityNeeded }}
-          </option>
+        <input 
+          type="text" 
+          class="form-control" 
+          [(ngModel)]="newPurchaseRequest.toolRequestName" 
+          name="toolRequestName"
+          required
+          placeholder="أدخل اسم الأداة المطلوبة"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">الكمية</label>
+        <input 
+          type="number" 
+          class="form-control" 
+          [(ngModel)]="newPurchaseRequest.quantity" 
+          name="quantity"
+          min="1"
+          placeholder="الكمية المطلوبة"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">تاريخ الطلب</label>
+        <input 
+          type="datetime-local" 
+          class="form-control" 
+          [(ngModel)]="newPurchaseRequest.requestDate" 
+          name="requestDate"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">الحالة</label>
+        <select 
+          class="form-control" 
+          [(ngModel)]="newPurchaseRequest.status" 
+          name="status"
+        >
+          <option value="PendingApproval">في انتظار الموافقة</option>
+          <option value="Approved">موافق عليه</option>
+          <option value="Rejected">مرفوض</option>
         </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">الموافق</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          [(ngModel)]="newPurchaseRequest.approverName" 
+          name="approverName"
+          placeholder="اسم الموافق"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">تاريخ الموافقة</label>
+        <input 
+          type="datetime-local" 
+          class="form-control" 
+          [(ngModel)]="newPurchaseRequest.approvalDate" 
+          name="approvalDate"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">الميزانية المقدرة (ريال)</label>
