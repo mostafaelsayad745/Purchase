@@ -4,8 +4,19 @@ namespace Purchase.Server.DTOs;
 
 public class CreatePurchaseRequestDto
 {
-    [Required]
-    public int ToolRequestId { get; set; }
+    public int? ToolRequestId { get; set; }
+    
+    public string? ToolRequestName { get; set; }
+    
+    public int? Quantity { get; set; }
+    
+    public DateTime? RequestDate { get; set; }
+    
+    public string? Status { get; set; }
+    
+    public string? ApproverName { get; set; }
+    
+    public DateTime? ApprovalDate { get; set; }
 
     public decimal? EstimatedBudget { get; set; }
 }

@@ -19,37 +19,125 @@ public class ToolRequestsController : ControllerBase
         _logger = logger;
     }
 
-    // Step 1: Create Tool Request
     [HttpPost]
     public async Task<ActionResult<ToolRequestDto>> CreateToolRequest(CreateToolRequestDto dto)
     {
         try
         {
-            // Validate tool exists
-            var tool = await _context.StockItems.FindAsync(dto.ToolId);
-            if (tool == null)
+            int toolId;
+            int workAreaId;
+            int requesterId = 1; // Default requester
+
+            // Handle tool - accept either ToolId or ToolName
+            if (dto.ToolId.HasValue)
             {
-                return BadRequest(new { message = "الأداة المحددة غير موجودة", messageEn = "Tool not found" });
+                toolId = dto.ToolId.Value;
+                var tool = await _context.StockItems.FindAsync(toolId);
+                if (tool == null)
+                {
+                    return BadRequest(new { message = "الأداة المحددة غير موجودة", messageEn = "Tool not found" });
+                }
+            }
+            else if (!string.IsNullOrEmpty(dto.ToolName))
+            {
+                // Try to find by name, or create a new one if needed
+                var tool = await _context.StockItems.FirstOrDefaultAsync(t => t.NameAr == dto.ToolName);
+                if (tool == null)
+                {
+                    // Create a new stock item
+                    var newTool = new StockItem
+                    {
+                        NameAr = dto.ToolName,
+                        NameEn = dto.ToolName,
+                        CurrentQuantity = 0,
+                        MinimumQuantity = 1,
+                        Unit = "قطعة"
+                    };
+                    _context.StockItems.Add(newTool);
+                    await _context.SaveChangesAsync();
+                    toolId = newTool.Id;
+                }
+                else
+                {
+                    toolId = tool.Id;
+                }
+            }
+            else
+            {
+                return BadRequest(new { message = "يجب تحديد الأداة إما بالمعرف أو الاسم", messageEn = "Tool must be specified by ID or name" });
             }
 
-            // Validate work area exists
-            var workArea = await _context.WorkAreas.FindAsync(dto.WorkAreaId);
-            if (workArea == null)
+            // Handle work area - accept either WorkAreaId or WorkAreaName
+            if (dto.WorkAreaId.HasValue)
             {
-                return BadRequest(new { message = "منطقة العمل المحددة غير موجودة", messageEn = "Work area not found" });
+                workAreaId = dto.WorkAreaId.Value;
+                var workArea = await _context.WorkAreas.FindAsync(workAreaId);
+                if (workArea == null)
+                {
+                    return BadRequest(new { message = "منطقة العمل المحددة غير موجودة", messageEn = "Work area not found" });
+                }
+            }
+            else if (!string.IsNullOrEmpty(dto.WorkAreaName))
+            {
+                // Try to find by name, or create a new one if needed
+                var workArea = await _context.WorkAreas.FirstOrDefaultAsync(w => w.NameAr == dto.WorkAreaName);
+                if (workArea == null)
+                {
+                    // Create a new work area
+                    var newWorkArea = new WorkArea
+                    {
+                        NameAr = dto.WorkAreaName,
+                        NameEn = dto.WorkAreaName,
+                        Location = "غير محدد"
+                    };
+                    _context.WorkAreas.Add(newWorkArea);
+                    await _context.SaveChangesAsync();
+                    workAreaId = newWorkArea.Id;
+                }
+                else
+                {
+                    workAreaId = workArea.Id;
+                }
+            }
+            else
+            {
+                return BadRequest(new { message = "يجب تحديد منطقة العمل إما بالمعرف أو الاسم", messageEn = "Work area must be specified by ID or name" });
             }
 
-            // For demo purposes, using user ID 1 as requester
+            // Handle requester - accept either default or RequesterName
+            if (!string.IsNullOrEmpty(dto.RequesterName))
+            {
+                var requester = await _context.Users.FirstOrDefaultAsync(u => u.FullNameAr == dto.RequesterName);
+                if (requester == null)
+                {
+                    // Create a new user
+                    var newRequester = new User
+                    {
+                        Username = dto.RequesterName.Replace(" ", "").ToLower(),
+                        FullNameAr = dto.RequesterName,
+                        FullNameEn = dto.RequesterName,
+                        Role = "Employee"
+                    };
+                    _context.Users.Add(newRequester);
+                    await _context.SaveChangesAsync();
+                    requesterId = newRequester.Id;
+                }
+                else
+                {
+                    requesterId = requester.Id;
+                }
+            }
+
             var toolRequest = new ToolRequest
             {
-                ToolId = dto.ToolId,
+                ToolId = toolId,
                 QuantityNeeded = dto.QuantityNeeded,
-                WorkAreaId = dto.WorkAreaId,
-                RequesterId = 1, // TODO: Get from authenticated user
+                WorkAreaId = workAreaId,
+                RequesterId = requesterId,
                 RequestDate = DateTime.UtcNow,
                 ReasonAr = dto.ReasonAr,
                 ReasonEn = dto.ReasonEn,
-                Status = "Pending",
+                Status = !string.IsNullOrEmpty(dto.Status) ? dto.Status : "Pending",
                 IsInStock = false
             };
 

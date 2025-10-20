@@ -119,6 +119,24 @@ export class ToolRequestListComponent implements OnInit {
     this.router.navigate(['/tool-requests/create']);
   }
 
+  viewDetails(id: number) {
+    // For now, just show an alert with details. In production, navigate to a detail page
+    const request = this.toolRequests.find(r => r.id === id);
+    if (request) {
+      alert(`
+تفاصيل الطلب:
+رقم الطلب: ${request.id}
+الأداة: ${request.toolNameAr}
+الكمية: ${request.quantityNeeded}
+منطقة العمل: ${request.workAreaNameAr}
+مقدم الطلب: ${request.requesterNameAr}
+التاريخ: ${new Date(request.requestDate).toLocaleString('ar-EG')}
+الحالة: ${this.getStatusText(request.status)}
+السبب: ${request.reasonAr}
+      `);
+    }
+  }
+
   sendToPurchaseRequest(request: ToolRequest) {
     if (confirm(`هل تريد إرسال طلب الأداة "${request.toolNameAr}" إلى طلبات الشراء؟`)) {
       this.purchaseRequestService.createPurchaseRequest({
