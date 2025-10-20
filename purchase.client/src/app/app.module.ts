@@ -10,6 +10,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ToolRequestListComponent } from './components/tool-request/tool-request-list.component';
 import { CreateToolRequestComponent } from './components/tool-request/create-tool-request.component';
 import { PurchaseRequestListComponent } from './components/purchase-request/purchase-request-list.component';
+import { PurchaseRequestDetailComponent } from './components/purchase-request/purchase-request-detail.component';
 import { QuotationListComponent } from './components/quotation/quotation-list.component';
 import { PurchaseOrderListComponent } from './components/purchase-order/purchase-order-list.component';
 import { CreatePurchaseOrderComponent } from './components/purchase-order/create-purchase-order.component';
@@ -28,6 +29,7 @@ import { PaymentDetailComponent } from './components/payment/payment-detail.comp
     ToolRequestListComponent,
     CreateToolRequestComponent,
     PurchaseRequestListComponent,
+    PurchaseRequestDetailComponent,
     QuotationListComponent,
     PurchaseOrderListComponent,
     CreatePurchaseOrderComponent,

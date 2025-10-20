@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToolRequestService, ToolRequest } from '../../services/tool-request.service';
+import { PurchaseRequestService } from '../../services/purchase-request.service';
 
 @Component({
   selector: 'app-tool-request-list',
@@ -26,6 +27,7 @@ export class ToolRequestListComponent implements OnInit {
 
   constructor(
     private toolRequestService: ToolRequestService,
+    private purchaseRequestService: PurchaseRequestService,
     private router: Router
   ) {}
 
@@ -115,5 +117,23 @@ export class ToolRequestListComponent implements OnInit {
 
   createNew() {
     this.router.navigate(['/tool-requests/create']);
+  }
+
+  sendToPurchaseRequest(request: ToolRequest) {
+    if (confirm(`هل تريد إرسال طلب الأداة "${request.toolNameAr}" إلى طلبات الشراء؟`)) {
+      this.purchaseRequestService.createPurchaseRequest({
+        toolRequestId: request.id,
+        estimatedBudget: 0
+      }).subscribe({
+        next: (purchaseRequest) => {
+          alert(`تم إنشاء طلب الشراء بنجاح (رقم ${purchaseRequest.id})`);
+          this.loadToolRequests();
+        },
+        error: (err) => {
+          console.error('Error creating purchase request:', err);
+          alert('حدث خطأ في إنشاء طلب الشراء');
+        }
+      });
+    }
   }
 }
